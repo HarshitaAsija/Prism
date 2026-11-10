@@ -12,14 +12,13 @@ This is our lightweight feedback loop — no full ML retraining needed.
 
 from typing import Dict, List, Optional
 from database import get_candidate, get_ranked_results
-from embedder import embed_text, build_candidate_profile_text
 import numpy as np
 
 
 def apply_feedback_boost(
     ranked_results: List[Dict],
     run_id: str,
-    feedback_map: Dict[str, str],   # {candidate_id: feedback_type}
+    feedback_map: Dict[str, str],  # {candidate_id: feedback_type}
 ) -> List[Dict]:
     """
     Adjust composite scores based on recruiter feedback.
@@ -41,8 +40,8 @@ def apply_feedback_boost(
 
     # Separate candidates by feedback type
     strong_yes_ids = {cid for cid, ft in feedback_map.items() if ft == "strong_yes"}
-    not_fit_ids    = {cid for cid, ft in feedback_map.items() if ft == "not_a_fit"}
-    maybe_ids      = {cid for cid, ft in feedback_map.items() if ft == "maybe"}
+    not_fit_ids = {cid for cid, ft in feedback_map.items() if ft == "not_a_fit"}
+    maybe_ids = {cid for cid, ft in feedback_map.items() if ft == "maybe"}
 
     # Filter out 'not_a_fit'
     filtered = [r for r in ranked_results if r.get("candidate_id") not in not_fit_ids]
@@ -53,9 +52,7 @@ def apply_feedback_boost(
     # Build similarity map if we have strong_yes picks to learn from
     similarity_boosts = {}
     if strong_yes_ids:
-        similarity_boosts = _compute_similarity_boosts(
-            strong_yes_ids, filtered
-        )
+        similarity_boosts = _compute_similarity_boosts(strong_yes_ids, filtered)
 
     # Apply adjustments
     adjusted = []
@@ -83,8 +80,11 @@ def apply_feedback_boost(
         else:
             new_result["feedback_tag"] = ""
 
-        new_result["composite_score"]     = round(score, 2)
-        new_result["feedback_adjusted"]   = True
+        new_result["composite_score"] = round(score, 2)
+        new_result["feedback_adjusted"] = True
+        new_result["explanation"] = (
+            "Feedback-adjusted ranking. Review the original score breakdown and recruiter notes."
+        )
         adjusted.append(new_result)
 
     # Re-sort by adjusted composite score
@@ -105,6 +105,8 @@ def _compute_similarity_boosts(
 
     Uses profile text embeddings and cosine similarity.
     """
+    from embedder import embed_text, build_candidate_profile_text
+
     # Fetch profiles for strong_yes candidates
     yes_profiles = []
     for cid in strong_yes_ids:
@@ -131,11 +133,11 @@ def _compute_similarity_boosts(
             continue
 
         text = build_candidate_profile_text(cand)
-        vec  = np.array(embed_text(text))
-        vec  = vec / (np.linalg.norm(vec) + 1e-9)
+        vec = np.array(embed_text(text))
+        vec = vec / (np.linalg.norm(vec) + 1e-9)
 
         similarity = float(np.dot(yes_vec, vec))
-        if similarity > 0.7:     # only boost meaningfully similar candidates
+        if similarity > 0.7:  # only boost meaningfully similar candidates
             boosts[cid] = similarity
 
     return boosts

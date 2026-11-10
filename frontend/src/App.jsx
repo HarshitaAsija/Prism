@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useRef, Component } from 'react'
+import React, { useEffect, useState, useCallback, useRef, Component, lazy, Suspense } from 'react'
 
 // ── Error Boundary ─────────────────────────────────────────────────────────────
 class ErrorBoundary extends Component {
@@ -28,21 +28,24 @@ import CandidateCard from './components/CandidateCard'
 import LoadingPipeline from './components/LoadingPipeline'
 import SkillHeatmap from './components/SkillHeatmap'
 import ExportButton from './components/ExportButton'
-import CompareModal from './components/CompareModal'
+const CompareModal = lazy(() => import('./components/CompareModal'))
 import OutreachDrawer from './components/OutreachDrawer'
-import CandidatePool from './pages/CandidatePool'
-import AnalyticsDashboard from './pages/AnalyticsDashboard'
-import RunHistory from './pages/RunHistory'
-import LandingPage from './pages/LandingPage'
-import LoginPage from './pages/auth/LoginPage'
-import RegisterPage from './pages/auth/RegisterPage'
-import CandidateHome from './pages/candidate/CandidateHome'
-import Integrations from './pages/Integrations'
-import AboutPage from './pages/AboutPage'
+const CandidatePool = lazy(() => import('./pages/CandidatePool'))
+const AnalyticsDashboard = lazy(() => import('./pages/AnalyticsDashboard'))
+const RunHistory = lazy(() => import('./pages/RunHistory'))
+const LandingPage = lazy(() => import('./pages/LandingPage'))
+const LoginPage = lazy(() => import('./pages/auth/LoginPage'))
+const RegisterPage = lazy(() => import('./pages/auth/RegisterPage'))
+const CandidateHome = lazy(() => import('./pages/candidate/CandidateHome'))
+const Integrations = lazy(() => import('./pages/Integrations'))
+const AboutPage = lazy(() => import('./pages/AboutPage'))
 import ProtectedRoute from './components/ProtectedRoute'
 import { AuthProvider, useAuth } from './context/AuthContext'
-import { getHealth, getStats, getCandidates, rankCandidates, getRunResults } from './api/client'
-import { normalizeWeights } from './utils/helpers'
+import { getHealth, getStats, getCandidates, rankCandidates, getRunResults, rerankRun } from './api/client'
+import { normalizeWeights, reweightResults } from './utils/helpers'
+
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'))
+const HiringWorkspace = lazy(() => import('./pages/HiringWorkspace'))
 
 function MainApp() {
   const { user, isAuthenticated } = useAuth()
@@ -75,6 +78,7 @@ function MainApp() {
       setBackendStatus({ status: 'offline' })
     }
 
+    if (!isAuthenticated || user?.role === 'candidate') { setStats(null); setCandidates([]); return; }
     try {
       const s = await getStats()
       setStats(s)
@@ -84,9 +88,10 @@ function MainApp() {
       const data = await getCandidates()
       setCandidates(Array.isArray(data) ? data : data.candidates || [])
     } catch {}
-  }, [])
+  }, [isAuthenticated, user?.email, user?.role])
 
   useEffect(() => {
+    setResults([]); setRunId(null); setCompareList([]); setOutreachCandidate(null); setParsedJd(null); setJdText('');
     loadInitial()
   }, [loadInitial])
 
@@ -96,7 +101,7 @@ function MainApp() {
         if (user.role === 'candidate') {
           setActivePage('candidate')
         } else {
-          setActivePage('dashboard')
+          setActivePage(user.role === 'admin' ? 'admin' : 'dashboard')
         }
       }
     } else {
@@ -122,39 +127,7 @@ function MainApp() {
   const handleWeightsChange = (newWeights) => {
     setWeights(newWeights);
 
-    if (results.length > 0) {
-      const normalized = normalizeWeights(newWeights);
-      const reRanked = results.map(c => {
-        const breakdown = c.score_breakdown || {};
-        const semantic = parseFloat(breakdown.semantic || 0);
-        const skill = parseFloat(breakdown.skill || 0);
-        const trajectory = parseFloat(breakdown.trajectory || 0);
-        const behavioral = parseFloat(breakdown.behavioral || 0);
-        const domain = parseFloat(breakdown.domain || 0);
-
-        const newScore = (
-          semantic * (normalized.semantic || 0) +
-          skill * (normalized.skill || 0) +
-          trajectory * (normalized.trajectory || 0) +
-          behavioral * (normalized.behavioral || 0) +
-          domain * (normalized.domain || 0)
-        );
-
-        return {
-          ...c,
-          composite_score: newScore * 100,
-        };
-      });
-
-      reRanked.sort((a, b) => b.composite_score - a.composite_score);
-      
-      const finalResults = reRanked.map((c, idx) => ({
-        ...c,
-        rank: idx + 1
-      }));
-
-      setResults(finalResults);
-    }
+    if (results.length > 0) setResults(reweightResults(results,newWeights));
   };
 
   const handleAnalyze = async () => {
@@ -174,7 +147,9 @@ function MainApp() {
       setResults(ranked)
       setRunId(data.run_id || data.id || null)
 
+      setParsedJd(data.jd_parsed);
       const skills =
+        data.jd_parsed?.required_skills ||
         data.required_skills ||
         data.parsed_jd?.required_skills ||
         data.jd_analysis?.required_skills ||
@@ -196,7 +171,7 @@ function MainApp() {
   const handleFeedbackGiven = useCallback(async () => {
     if (runId) {
       try {
-        const data = await getRunResults(runId)
+        const data = await rerankRun(runId)
         const ranked = data.results || []
         if (ranked.length > 0) setResults(ranked)
       } catch {}
@@ -231,6 +206,7 @@ function MainApp() {
     return (
       <LoginPage
         onBack={() => setActivePage('landing')}
+        onRegister={() => setActivePage('register')}
         onSuccess={() => {}}
         defaultRole={loginRolePreset}
       />
@@ -251,7 +227,7 @@ function MainApp() {
     return <LandingPage onNavigate={navigateTo} isAuthenticated={isAuthenticated} user={user} />
   }
 
-  const showSidebar = isAuthenticated && user.role === 'recruiter';
+  const showSidebar = isAuthenticated && ['recruiter','admin'].includes(user.role);
 
   return (
     <div className="min-h-screen flex">
@@ -318,8 +294,12 @@ function MainApp() {
             <ProtectedRoute allowedRoles={['candidate']}>
               <CandidateHome />
             </ProtectedRoute>
+          ) : activePage === 'admin' ? (
+            <ProtectedRoute allowedRoles={['admin']}><AdminDashboard /></ProtectedRoute>
+          ) : activePage === 'jobs' ? (
+            <ProtectedRoute allowedRoles={['recruiter','admin']}><HiringWorkspace /></ProtectedRoute>
           ) : activePage === 'pool' ? (
-            <ProtectedRoute allowedRoles={['recruiter']}>
+            <ProtectedRoute allowedRoles={['recruiter','admin']}>
               <CandidatePool
                 candidates={candidates}
                 onRefresh={loadInitial}
@@ -327,19 +307,19 @@ function MainApp() {
               />
             </ProtectedRoute>
           ) : activePage === 'analytics' ? (
-            <ProtectedRoute allowedRoles={['recruiter']}>
+            <ProtectedRoute allowedRoles={['recruiter','admin']}>
               <AnalyticsDashboard />
             </ProtectedRoute>
           ) : activePage === 'integrations' ? (
-            <ProtectedRoute allowedRoles={['recruiter']}>
+            <ProtectedRoute allowedRoles={['recruiter','admin']}>
               <Integrations />
             </ProtectedRoute>
           ) : activePage === 'history' ? (
-            <ProtectedRoute allowedRoles={['recruiter']}>
+            <ProtectedRoute allowedRoles={['recruiter','admin']}>
               <RunHistory />
             </ProtectedRoute>
           ) : (
-            <ProtectedRoute allowedRoles={['recruiter']}>
+            <ProtectedRoute allowedRoles={['recruiter','admin']}>
               <div className="space-y-6">
                 
                 {!loading && results.length === 0 && (
@@ -399,8 +379,8 @@ function MainApp() {
                           <div className="text-[10px] text-slate-500 uppercase tracking-wider">Scoring Dimensions</div>
                         </div>
                         <div className="text-center">
-                          <div className="text-xl font-black font-mono text-pink-400">&lt; 2s</div>
-                          <div className="text-[10px] text-slate-500 uppercase tracking-wider">Avg. Rank Time</div>
+                          <div className="text-xl font-black font-mono text-pink-400">5 signals</div>
+                          <div className="text-[10px] text-slate-500 uppercase tracking-wider">Explainable scoring</div>
                         </div>
                       </div>
                     )}
@@ -447,6 +427,7 @@ function MainApp() {
                   {/* Right Column: Weights */}
                   <div className="space-y-6 flex flex-col h-full">
                     <WeightSliders weights={weights} onChange={handleWeightsChange} />
+                    {runId && <p className="text-xs text-slate-400">Weight and feedback changes preview the ranking. Run ranking again to save a new result. CSV export contains the saved run.</p>}
                     
                     {runId && (
                       <div className="glass rounded-xl p-4 flex items-center gap-3">
@@ -528,7 +509,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <AuthProvider>
-        <MainApp />
+        <Suspense fallback={<div role="status" className="p-10 text-slate-300">Loading page...</div>}><MainApp /></Suspense>
       </AuthProvider>
     </ErrorBoundary>
   )

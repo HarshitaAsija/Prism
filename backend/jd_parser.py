@@ -7,13 +7,8 @@ import json
 import re
 from typing import Dict
 
-from openai import OpenAI
-from config import NVIDIA_API_KEY, NVIDIA_BASE_URL, NVIDIA_MODEL
-
-_client = OpenAI(
-    base_url=NVIDIA_BASE_URL,
-    api_key=NVIDIA_API_KEY,
-)
+from llm_client import chat, system_user, AIUnavailable
+from models import JDParsed
 
 SYSTEM_PROMPT = """You are a precise job description parser for a recruitment AI system.
 Extract structured information from job descriptions and return ONLY valid JSON.
@@ -59,22 +54,12 @@ def parse_jd(jd_text: str) -> Dict:
     Returns structured dict. Falls back to empty structure on error.
     """
     if not jd_text or not jd_text.strip():
-        return _empty_jd()
+        raise ValueError("Job description cannot be empty.")
 
     prompt = USER_PROMPT_TEMPLATE.format(jd_text=jd_text.strip())
 
     try:
-        response = _client.chat.completions.create(
-            model=NVIDIA_MODEL,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user",   "content": prompt},
-            ],
-            temperature=0.1,      # low temp = consistent, structured output
-            max_tokens=1500,
-        )
-
-        raw = response.choices[0].message.content.strip()
+        raw = chat(system_user(SYSTEM_PROMPT, prompt), temperature=0.1, max_tokens=1500).strip()
 
         # Strip markdown code fences if model wraps in them anyway
         raw = re.sub(r"^```(?:json)?\s*", "", raw)
@@ -84,14 +69,10 @@ def parse_jd(jd_text: str) -> Dict:
         parsed = json.loads(raw)
 
         # Ensure all expected keys exist (fill missing with defaults)
-        return _merge_defaults(parsed)
+        return JDParsed.model_validate(_merge_defaults(parsed)).model_dump()
 
-    except json.JSONDecodeError as e:
-        print(f"[JDParser] JSON parse error: {e}\nRaw: {raw[:300]}")
-        return _empty_jd()
     except Exception as e:
-        print(f"[JDParser] API error: {e}")
-        return _empty_jd()
+        raise AIUnavailable("Job description analysis failed. Please retry.") from e
 
 
 def _merge_defaults(parsed: Dict) -> Dict:
@@ -104,20 +85,20 @@ def _merge_defaults(parsed: Dict) -> Dict:
 
 def _empty_jd() -> Dict:
     return {
-        "job_title":             "Unknown",
-        "seniority_level":       "mid",
-        "domain":                "general",
-        "required_skills":       [],
-        "preferred_skills":      [],
-        "years_experience_min":  0,
-        "years_experience_max":  20,
-        "key_responsibilities":  [],
-        "deal_breakers":         [],
-        "soft_skills":           [],
+        "job_title": "Unknown",
+        "seniority_level": "mid",
+        "domain": "general",
+        "required_skills": [],
+        "preferred_skills": [],
+        "years_experience_min": 0,
+        "years_experience_max": 20,
+        "key_responsibilities": [],
+        "deal_breakers": [],
+        "soft_skills": [],
         "education_requirement": "any",
-        "remote_friendly":       None,
+        "remote_friendly": None,
         "suggested_weight_bias": "balanced",
-        "domain_keywords":       [],
+        "domain_keywords": [],
     }
 
 
@@ -146,22 +127,28 @@ JOB DESCRIPTION:
 {jd_text}"""
 
     try:
-        response = _client.chat.completions.create(
-            model=NVIDIA_MODEL,
-            messages=[
-                {"role": "system", "content": BIAS_SYSTEM_PROMPT},
-                {"role": "user",   "content": prompt},
-            ],
-            temperature=0.1,
-            max_tokens=1000,
-        )
-
-        raw = response.choices[0].message.content.strip()
+        raw = chat(
+            system_user(BIAS_SYSTEM_PROMPT, prompt), temperature=0.1, max_tokens=2000
+        ).strip()
         raw = re.sub(r"^```(?:json)?\s*", "", raw)
         raw = re.sub(r"\s*```$", "", raw)
-        
+
         parsed = json.loads(raw)
-        return parsed
+        return BiasResult.model_validate(parsed).model_dump()
     except Exception as e:
-        print(f"[JDParser] Bias scan error: {e}")
-        return {"flags": [], "score": 100}
+        raise AIUnavailable("Bias analysis failed. No inclusivity score was assigned.") from e
+
+
+from pydantic import BaseModel, Field
+
+
+class BiasFlag(BaseModel):
+    phrase: str
+    reason: str
+    suggestion: str
+
+
+class BiasResult(BaseModel):
+    flags: list[BiasFlag]
+    score: float = Field(ge=0, le=100)
+    fixed_jd: str

@@ -79,7 +79,8 @@ def export_ranked_csv(run_id: str, output_path: str = None) -> str:
                     skill_gap_raw = []
 
             missing_skills = [
-                sg["skill"] for sg in skill_gap_raw
+                sg["skill"]
+                for sg in skill_gap_raw
                 if isinstance(sg, dict) and sg.get("status") == "missing" and sg.get("required")
             ]
 
@@ -92,26 +93,28 @@ def export_ranked_csv(run_id: str, output_path: str = None) -> str:
                     skills_raw = [s.strip() for s in skills_raw.split(",")]
             top_skills = ", ".join(str(s) for s in skills_raw[:6])
 
-            writer.writerow({
-                "rank":              r.get("rank_position", ""),
-                "candidate_id":      r.get("candidate_id", ""),
-                "name":              r.get("name", ""),
-                "current_title":     r.get("current_title", ""),
-                "current_company":   r.get("current_company", ""),
-                "location":          r.get("location", ""),
-                "years_experience":  r.get("years_experience", ""),
-                "domain":            r.get("domain", ""),
-                "composite_score":   r.get("composite_score", ""),
-                "semantic_score":    r.get("semantic_score", ""),
-                "skill_score":       r.get("skill_score", ""),
-                "trajectory_score":  r.get("trajectory_score", ""),
-                "behavioral_score":  r.get("behavioral_score", ""),
-                "domain_score":      r.get("domain_score", ""),
-                "top_skills":        top_skills,
-                "skill_gaps":        ", ".join(missing_skills),
-                "explanation":       r.get("explanation", ""),
-                "outreach_message":  r.get("outreach_msg", ""),
-            })
+            writer.writerow(
+                {
+                    "rank": r.get("rank_position", ""),
+                    "candidate_id": r.get("candidate_id", ""),
+                    "name": r.get("name", ""),
+                    "current_title": r.get("current_title", ""),
+                    "current_company": r.get("current_company", ""),
+                    "location": r.get("location", ""),
+                    "years_experience": r.get("years_experience", ""),
+                    "domain": r.get("domain", ""),
+                    "composite_score": r.get("composite_score", ""),
+                    "semantic_score": r.get("semantic_score", ""),
+                    "skill_score": r.get("skill_score", ""),
+                    "trajectory_score": r.get("trajectory_score", ""),
+                    "behavioral_score": r.get("behavioral_score", ""),
+                    "domain_score": r.get("domain_score", ""),
+                    "top_skills": top_skills,
+                    "skill_gaps": ", ".join(missing_skills),
+                    "explanation": r.get("explanation", ""),
+                    "outreach_message": r.get("outreach_msg", ""),
+                }
+            )
 
     print(f"[Exporter] ✅ Exported {len(results)} candidates to: {output_path}")
     print(f"[Exporter]    Job title: {jd_title}")
@@ -133,11 +136,11 @@ def export_summary_report(run_id: str, output_path: str = None) -> str:
         return ""
 
     jd_parsed = run_meta.get("jd_parsed", {})
-    weights   = run_meta.get("weights", {})
+    weights = run_meta.get("weights", {})
 
     lines = [
         "=" * 65,
-        f"  AI RECRUITER — RANKING SUMMARY REPORT",
+        "  AI RECRUITER — RANKING SUMMARY REPORT",
         "=" * 65,
         f"  Run ID:      {run_id}",
         f"  Job Title:   {jd_parsed.get('job_title', 'N/A')}",
@@ -145,7 +148,7 @@ def export_summary_report(run_id: str, output_path: str = None) -> str:
         f"  Seniority:   {jd_parsed.get('seniority_level', 'N/A')}",
         f"  Required:    {', '.join(jd_parsed.get('required_skills', [])[:6])}",
         "",
-        f"  Scoring Weights Used:",
+        "  Scoring Weights Used:",
         f"    Semantic:    {round(weights.get('semantic', 0) * 100)}%",
         f"    Skill:       {round(weights.get('skill', 0) * 100)}%",
         f"    Trajectory:  {round(weights.get('trajectory', 0) * 100)}%",

@@ -11,10 +11,12 @@ export default function Sidebar({ activePage, onPageChange, onNavigate }) {
   const { user, logout } = useAuth();
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: <BarChart2 size={18} />, roles: ['recruiter'] },
-    { id: 'pool', label: 'Candidate Pool', icon: <Users size={18} />, roles: ['recruiter'] },
-    { id: 'analytics', label: 'Analytics', icon: <Activity size={18} />, roles: ['recruiter'] },
-    { id: 'history', label: 'Run History', icon: <Cpu size={18} />, roles: ['recruiter'] },
+    { id: 'admin', label: 'System metrics', icon: <Shield size={18} />, roles: ['admin'] },
+    { id: 'jobs', label: 'Hiring workspace', icon: <Users size={18} />, roles: ['recruiter','admin'] },
+    { id: 'dashboard', label: 'Dashboard', icon: <BarChart2 size={18} />, roles: ['recruiter','admin'] },
+    { id: 'pool', label: 'Candidate Pool', icon: <Users size={18} />, roles: ['recruiter','admin'] },
+    { id: 'analytics', label: 'Analytics', icon: <Activity size={18} />, roles: ['recruiter','admin'] },
+    { id: 'history', label: 'Run History', icon: <Cpu size={18} />, roles: ['recruiter','admin'] },
   ];
 
   const filteredItems = menuItems.filter(item => item.roles.includes(user?.role));
@@ -23,7 +25,7 @@ export default function Sidebar({ activePage, onPageChange, onNavigate }) {
     <motion.aside
       animate={{ width: isCollapsed ? '72px' : '260px' }}
       transition={{ duration: 0.3, ease: 'easeInOut' }}
-      className="sticky top-0 h-screen glass border-r border-white/5 flex flex-col justify-between z-40 overflow-visible"
+      className="hidden lg:flex sticky top-0 h-screen glass border-r border-white/5 flex flex-col justify-between z-40 overflow-visible"
     >
       <div>
         {/* Logo / Header */}
@@ -64,7 +66,7 @@ export default function Sidebar({ activePage, onPageChange, onNavigate }) {
                 className="overflow-hidden"
               >
                 <h4 className="text-xs font-semibold text-slate-200 truncate">{user?.name}</h4>
-                <p className="text-[10px] text-slate-500 truncate">{user?.company || 'Prism Demo'}</p>
+                <p className="text-[10px] text-slate-500 truncate">{user?.company || 'Recruiter workspace'}</p>
               </motion.div>
             )}
           </div>

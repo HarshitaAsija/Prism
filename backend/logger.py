@@ -14,19 +14,19 @@ import os
 from logging.handlers import RotatingFileHandler
 from config import DATA_DIR
 
-LOG_DIR  = os.path.join(DATA_DIR, "logs")
+LOG_DIR = os.path.join(DATA_DIR, "logs")
 LOG_FILE = os.path.join(LOG_DIR, "app.log")
 os.makedirs(LOG_DIR, exist_ok=True)
 
 # ── Format ─────────────────────────────────────────────────────────────────────
-_FMT  = "%(asctime)s | %(levelname)-8s | %(name)-25s | %(message)s"
+_FMT = "%(asctime)s | %(levelname)-8s | %(name)-25s | %(message)s"
 _DATE = "%Y-%m-%d %H:%M:%S"
 
 
 def _setup_root_logger():
     root = logging.getLogger()
     if root.handlers:
-        return   # already configured
+        return  # already configured
 
     root.setLevel(logging.INFO)
 
@@ -36,9 +36,7 @@ def _setup_root_logger():
     ch.setFormatter(logging.Formatter(_FMT, datefmt=_DATE))
 
     # Rotating file handler (5 MB × 3 backups)
-    fh = RotatingFileHandler(
-        LOG_FILE, maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8"
-    )
+    fh = RotatingFileHandler(LOG_FILE, maxBytes=5 * 1024 * 1024, backupCount=3, encoding="utf-8")
     fh.setLevel(logging.DEBUG)
     fh.setFormatter(logging.Formatter(_FMT, datefmt=_DATE))
 

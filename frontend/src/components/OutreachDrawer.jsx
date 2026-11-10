@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import useDialogFocus from '../hooks/useDialogFocus';
 import { motion } from 'framer-motion';
 import { X, Copy, Mail, ExternalLink, Edit2, Check } from 'lucide-react';
 import { copyToClipboard } from '../utils/helpers';
 
 export default function OutreachDrawer({ candidate, onClose }) {
+  const dialogRef = useDialogFocus(onClose);
   const [copied, setCopied] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState(candidate?.outreach_msg || candidate?.outreach_message || '');
@@ -25,6 +27,7 @@ export default function OutreachDrawer({ candidate, onClose }) {
       onClick={onClose}
     >
       <motion.div
+        ref={dialogRef} role="dialog" aria-modal="true" aria-label="Personalized outreach" tabIndex={-1}
         initial={{ x: '100%' }}
         animate={{ x: 0 }}
         exit={{ x: '100%' }}
@@ -40,6 +43,7 @@ export default function OutreachDrawer({ candidate, onClose }) {
               <h2 className="text-lg font-bold text-slate-100">Personalized Outreach</h2>
             </div>
             <button
+              aria-label="Close outreach"
               onClick={onClose}
               className="p-1 rounded-lg text-slate-500 hover:text-slate-200 hover:bg-white/5 transition-all"
             >

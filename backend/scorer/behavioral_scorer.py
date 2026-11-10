@@ -2,8 +2,8 @@
 scorer/behavioral_scorer.py — Signal 4: Behavioral Intent & Activity
 
 Analyses metadata signals to estimate job-seeking intent.
-These signals CANNOT be faked by AI-polished resumes — making this
-our most AI-resistant scoring dimension.
+These signals may be incomplete or self-reported — making this
+an optional availability heuristic.
 """
 
 from datetime import datetime, date
@@ -22,15 +22,16 @@ def behavioral_score(candidate: Dict) -> float:
       - Skills added recently          (10%)
     """
     score = 0.0
-    score += _activity_recency_score(candidate)   * 0.40
-    score += _completeness_score(candidate)       * 0.30
-    score += _native_activity_score(candidate)    * 0.20
-    score += _recent_skills_score(candidate)      * 0.10
+    score += _activity_recency_score(candidate) * 0.40
+    score += _completeness_score(candidate) * 0.30
+    score += _native_activity_score(candidate) * 0.20
+    score += _recent_skills_score(candidate) * 0.10
 
     return round(min(1.0, max(0.0, score)), 4)
 
 
 # ── Sub-scores ─────────────────────────────────────────────────────────────────
+
 
 def _activity_recency_score(candidate: Dict) -> float:
     """
@@ -92,7 +93,7 @@ def _recent_skills_score(candidate: Dict) -> float:
         if val:
             try:
                 count = int(val)
-                return min(1.0, count / 5.0)   # 5 new skills = max score
+                return min(1.0, count / 5.0)  # 5 new skills = max score
             except (TypeError, ValueError):
                 pass
 
@@ -105,12 +106,18 @@ def _recent_skills_score(candidate: Dict) -> float:
 
 # ── Helper ─────────────────────────────────────────────────────────────────────
 
+
 def _days_since(date_str: str) -> Optional[int]:
     """Parse a date string and return days since then."""
     formats = [
-        "%Y-%m-%d", "%Y/%m/%d", "%d/%m/%Y", "%m/%d/%Y",
-        "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S",
-        "%b %d, %Y", "%B %d, %Y",
+        "%Y-%m-%d",
+        "%Y/%m/%d",
+        "%d/%m/%Y",
+        "%m/%d/%Y",
+        "%Y-%m-%dT%H:%M:%S",
+        "%Y-%m-%d %H:%M:%S",
+        "%b %d, %Y",
+        "%B %d, %Y",
     ]
     for fmt in formats:
         try:

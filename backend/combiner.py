@@ -10,12 +10,12 @@ from config import DEFAULT_WEIGHTS
 
 
 def combine_scores(
-    semantic:    float,
-    skill:       float,
-    trajectory:  float,
-    behavioral:  float,
-    domain:      float,
-    weights:     Dict[str, float] = None,
+    semantic: float,
+    skill: float,
+    trajectory: float,
+    behavioral: float,
+    domain: float,
+    weights: Dict[str, float] = None,
 ) -> float:
     """
     Args:
@@ -29,11 +29,11 @@ def combine_scores(
     w = _normalise_weights(weights or DEFAULT_WEIGHTS)
 
     raw = (
-        w["semantic"]   * semantic   +
-        w["skill"]      * skill      +
-        w["trajectory"] * trajectory +
-        w["behavioral"] * behavioral +
-        w["domain"]     * domain
+        w["semantic"] * semantic
+        + w["skill"] * skill
+        + w["trajectory"] * trajectory
+        + w["behavioral"] * behavioral
+        + w["domain"] * domain
     )
 
     # Convert to 0-100 scale and round to 2dp
@@ -42,29 +42,29 @@ def combine_scores(
 
 def build_score_dict(
     candidate_id: str,
-    semantic:     float,
-    skill:        float,
-    trajectory:   float,
-    behavioral:   float,
-    domain:       float,
-    weights:      Dict[str, float] = None,
+    semantic: float,
+    skill: float,
+    trajectory: float,
+    behavioral: float,
+    domain: float,
+    weights: Dict[str, float] = None,
 ) -> Dict:
     """
     Build the full score record that gets saved to the DB and returned by the API.
     """
     composite = combine_scores(semantic, skill, trajectory, behavioral, domain, weights)
     return {
-        "candidate_id":    candidate_id,
-        "semantic_score":  round(semantic   * 100, 2),
-        "skill_score":     round(skill      * 100, 2),
-        "trajectory_score":round(trajectory * 100, 2),
-        "behavioral_score":round(behavioral * 100, 2),
-        "domain_score":    round(domain     * 100, 2),
+        "candidate_id": candidate_id,
+        "semantic_score": round(semantic * 100, 2),
+        "skill_score": round(skill * 100, 2),
+        "trajectory_score": round(trajectory * 100, 2),
+        "behavioral_score": round(behavioral * 100, 2),
+        "domain_score": round(domain * 100, 2),
         "composite_score": composite,
-        "rank_position":   0,   # filled in by ranker after sorting
-        "explanation":     None,
-        "outreach_msg":    None,
-        "skill_gap":       [],
+        "rank_position": 0,  # filled in by ranker after sorting
+        "explanation": None,
+        "outreach_msg": None,
+        "skill_gap": [],
     }
 
 

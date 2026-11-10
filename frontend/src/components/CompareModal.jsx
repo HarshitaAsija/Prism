@@ -1,16 +1,19 @@
 import React from 'react';
+import useDialogFocus from '../hooks/useDialogFocus';
 import { X, Award, Briefcase, MapPin, Mail, Star } from 'lucide-react';
 import { ScoreRadar } from './ScoreChart';
 import { normalizeScore, getFitLabel, getFitClass, formatYears, initials } from '../utils/helpers';
 
 export default function CompareModal({ candidates, onClose }) {
+  const dialogRef = useDialogFocus(onClose);
   if (!candidates || candidates.length === 0) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in">
-      <div className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto glass rounded-2xl p-6 border border-white/10 shadow-2xl no-scrollbar">
+      <div ref={dialogRef} role="dialog" aria-modal="true" aria-label="Candidate comparison" tabIndex={-1} className="relative w-full max-w-6xl max-h-[90vh] overflow-y-auto glass rounded-2xl p-6 border border-white/10 shadow-2xl no-scrollbar">
         {/* Close Button */}
         <button
+          aria-label="Close comparison"
           onClick={onClose}
           className="absolute top-4 right-4 p-2 rounded-xl text-slate-400 hover:text-slate-100 hover:bg-white/5 transition-all"
         >
@@ -26,7 +29,7 @@ export default function CompareModal({ candidates, onClose }) {
         </div>
 
         {/* Side-by-side Grid */}
-        <div className={`grid grid-cols-1 md:grid-cols-${candidates.length} gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-800`}>
+        <div className={`grid grid-cols-1 ${candidates.length === 2 ? 'md:grid-cols-2' : 'md:grid-cols-3'} gap-6 divide-y md:divide-y-0 md:divide-x divide-slate-800`}>
           {candidates.map((cand, idx) => {
             const score = normalizeScore(cand.composite_score);
             const fitLabel = getFitLabel(cand.composite_score);

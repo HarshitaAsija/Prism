@@ -9,8 +9,8 @@ export default function ExportButton({ runId, disabled }) {
     if (!runId || loading) return;
     setLoading(true);
     try {
-      downloadExport(runId);
-    } finally {
+      await downloadExport(runId);
+    } catch { window.alert('Export failed. Please try again.'); } finally {
       setTimeout(() => setLoading(false), 1000);
     }
   };
@@ -24,7 +24,7 @@ export default function ExportButton({ runId, disabled }) {
     >
       {loading
         ? <><Loader size={14} className="animate-spin"/> Preparing CSV…</>
-        : <><Download size={14}/> Export CSV</>}
+        : <><Download size={14}/> Export saved run</>}
     </button>
   );
 }

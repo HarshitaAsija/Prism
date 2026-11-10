@@ -44,7 +44,7 @@ export default function ProfileBuilder({ profile, onSave }) {
               <User size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
                 type="text"
-                value={name}
+                aria-label="Full Name" value={name}
                 onChange={e => setName(e.target.value)}
                 className="input-dark pl-9 py-2"
                 required
@@ -58,7 +58,7 @@ export default function ProfileBuilder({ profile, onSave }) {
               <Briefcase size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
                 type="text"
-                value={title}
+                aria-label="Professional Title" value={title}
                 onChange={e => setTitle(e.target.value)}
                 className="input-dark pl-9 py-2"
                 required
@@ -74,8 +74,9 @@ export default function ProfileBuilder({ profile, onSave }) {
               <Award size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
                 type="number"
+                min="0" max="80"
                 step="0.5"
-                value={experience}
+                aria-label="Years of Experience" value={experience}
                 onChange={e => setExperience(e.target.value)}
                 className="input-dark pl-9 py-2"
                 required
@@ -89,7 +90,7 @@ export default function ProfileBuilder({ profile, onSave }) {
               <Sparkles size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
                 type="text"
-                value={certsStr}
+                aria-label="Certifications (comma separated)" value={certsStr}
                 onChange={e => setCertsStr(e.target.value)}
                 placeholder="AWS Certified Practitioner, CKA"
                 className="input-dark pl-9 py-2"
@@ -102,7 +103,7 @@ export default function ProfileBuilder({ profile, onSave }) {
           <label className="block text-slate-400 mb-1">Skills (comma separated)</label>
           <input
             type="text"
-            value={skillsStr}
+            aria-label="Skills (comma separated)" value={skillsStr}
             onChange={e => setSkillsStr(e.target.value)}
             placeholder="React, Javascript, Python, FastAPI"
             className="input-dark py-2"
@@ -117,7 +118,7 @@ export default function ProfileBuilder({ profile, onSave }) {
               <Globe size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
                 type="url"
-                value={github}
+                aria-label="GitHub URL" value={github}
                 onChange={e => setGithub(e.target.value)}
                 placeholder="https://github.com/..."
                 className="input-dark pl-9 py-2"
@@ -131,7 +132,7 @@ export default function ProfileBuilder({ profile, onSave }) {
               <Link size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
               <input
                 type="url"
-                value={linkedin}
+                aria-label="LinkedIn URL" value={linkedin}
                 onChange={e => setLinkedin(e.target.value)}
                 placeholder="https://linkedin.com/in/..."
                 className="input-dark pl-9 py-2"

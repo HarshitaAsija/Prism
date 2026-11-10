@@ -16,7 +16,7 @@ const PORTALS = [
     gradient: 'from-teal-500/20 to-teal-600/5',
     border: 'border-teal-500/30',
     features: ['JD Analysis', 'AI Ranking', 'Smart Outreach', 'Export Reports'],
-    badge: 'Most Popular',
+    badge: null,
   },
   {
     id: 'candidate',
@@ -26,7 +26,7 @@ const PORTALS = [
     color: '#8b5cf6',
     gradient: 'from-violet-500/20 to-violet-600/5',
     border: 'border-violet-500/30',
-    features: ['Profile Builder', 'Resume Analyzer', 'Skill Gap Report', 'Interview Readiness'],
+    features: ['Profile Builder', 'Resume Analyzer', 'Skill Gap Report', 'Application Tracking'],
     badge: null,
   },
 ];
@@ -34,12 +34,12 @@ const PORTALS = [
 const FEATURES = [
   { icon: <Brain size={20} />, title: 'Semantic Vector Search', desc: 'ChromaDB-powered vector search finds candidates who mean the right things, even with different words. Goes beyond keyword matching entirely.', color: '#14b8a6' },
   { icon: <Layers size={20} />, title: '5D Scoring Engine', desc: 'Every candidate is scored across 5 weighted dimensions: Semantic, Skill Depth, Career Trajectory, Behavioral Intent, and Domain Relevance.', color: '#8b5cf6' },
-  { icon: <Target size={20} />, title: '"Why Not?" Rejection Explainer', desc: 'Every rank has an AI-written explanation. Recruiters know exactly why someone ranked where they did — no black boxes.', color: '#ec4899' },
+  { icon: <Target size={20} />, title: '"Why Not?" Rejection Explainer', desc: 'Top-ranked candidates can have AI-written explanations. Recruiters know exactly why someone ranked where they did — no black boxes.', color: '#ec4899' },
   { icon: <TrendingUp size={20} />, title: 'Career Trajectory Scoring', desc: 'Detects upward momentum, title progression, internal promotions, and tenure health to surface candidates on the rise.', color: '#f59e0b' },
-  { icon: <Zap size={20} />, title: 'Freshness Decay Telemetry', desc: 'Automatically penalizes stale profiles and boosts active, high-intent candidates using metadata signals that cannot be faked.', color: '#3b82f6' },
+  { icon: <Zap size={20} />, title: 'Freshness Decay Telemetry', desc: 'Automatically penalizes stale profiles and boosts active, high-intent candidates using available activity metadata, which may be incomplete or self-reported.', color: '#3b82f6' },
   { icon: <Shield size={20} />, title: 'JD Bias Scanner', desc: 'Auto-detects exclusionary language in job descriptions and suggests inclusive alternatives before you post.', color: '#10b981' },
   { icon: <Cpu size={20} />, title: 'AI Interview Prep', desc: 'Generates targeted, role-specific interview questions based on each candidate\'s exact skill gaps and experience level.', color: '#f97316' },
-  { icon: <Database size={20} />, title: 'Auto Outreach Drafts', desc: 'Personalized recruiter outreach messages generated for the top 5 candidates — specific, warm, and ready to send.', color: '#a78bfa' },
+  { icon: <Database size={20} />, title: 'Auto Outreach Drafts', desc: 'Personalized recruiter outreach messages generated for the top candidates — specific, warm, and ready to send.', color: '#a78bfa' },
 ];
 
 const INTEGRATIONS = [
@@ -54,10 +54,10 @@ const INTEGRATIONS = [
 ];
 
 const STATS = [
-  { value: '2,847', label: 'Candidates Indexed' },
-  { value: '5D', label: 'Scoring Dimensions' },
-  { value: '< 2s', label: 'Avg. Ranking Time' },
-  { value: '94%', label: 'Recruiter Satisfaction' },
+  { value: '5', label: 'Scoring dimensions' },
+  { value: '2', label: 'Hiring portals' },
+  { value: 'CSV', label: 'Shortlist exports' },
+  { value: 'Private', label: 'Profiles by default' },
 ];
 
 const PrismAnimation = () => {

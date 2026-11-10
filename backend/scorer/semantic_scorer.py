@@ -21,7 +21,7 @@ def semantic_score(raw_similarity: float) -> float:
     Returns:
         float: adjusted score 0-1
     """
-    sim = max(0.0, min(1.0, raw_similarity))   # clamp
+    sim = max(0.0, min(1.0, raw_similarity))  # clamp
 
     if sim < 0.3:
         # Below threshold — penalise quadratically

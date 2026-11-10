@@ -6,7 +6,7 @@ export default function Header({ backendStatus, stats, activePage, onPageChange 
   const isOnline = backendStatus?.status === 'ok';
   const { user, logout, isAuthenticated } = useAuth();
   const isCandidate = isAuthenticated && user?.role === 'candidate';
-  const isRecruiter = isAuthenticated && user?.role === 'recruiter';
+  const isRecruiter = isAuthenticated && ['recruiter','admin'].includes(user?.role);
 
   return (
     <header className="sticky top-0 z-50 glass border-b border-white/5">
@@ -34,10 +34,15 @@ export default function Header({ backendStatus, stats, activePage, onPageChange 
               </div>
             )}
 
+            {isRecruiter && <select aria-label="Navigate workspace" value={activePage} onChange={e => onPageChange(e.target.value)} className="sm:hidden input-dark w-36 text-xs">
+              <option value="dashboard">Dashboard</option><option value="jobs">Hiring workspace</option><option value="pool">Candidate pool</option><option value="analytics">Analytics</option><option value="history">Run history</option>
+              {user.role==='admin' && <option value="admin">System metrics</option>}
+            </select>}
             {/* Nav tabs — recruiter only */}
             {isRecruiter && (
-              <nav className="hidden sm:flex gap-1">
+              <nav className="hidden sm:flex gap-1 max-w-[40vw] overflow-x-auto">
                 {[
+                  { id: 'jobs', label: 'Hiring', icon: <Users size={14}/> },
                   { id: 'dashboard', label: 'Dashboard',      icon: <BarChart2 size={14}/> },
                   { id: 'pool',      label: 'Candidate Pool', icon: <Users size={14}/>     },
                   { id: 'analytics', label: 'Analytics',      icon: <Activity size={14}/>  },
@@ -60,7 +65,7 @@ export default function Header({ backendStatus, stats, activePage, onPageChange 
           <div className="flex items-center gap-3">
             {/* Stats chips — recruiter only */}
             {isRecruiter && stats && (
-              <div className="hidden md:flex items-center gap-2">
+              <div className="hidden 2xl:flex items-center gap-2">
                 <div className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-slate-800/60 border border-slate-700/40">
                   <Users size={12} className="text-teal-400" />
                   <span className="text-xs text-slate-400 font-mono">

@@ -23,7 +23,7 @@ const SIGNALS = [
   },
   {
     title: "④ Behavioral Intent (15%)",
-    desc: "Answers 'are they actually looking right now?' using metadata signals that cannot be faked like days since last active and native platform activity.",
+    desc: "Answers 'are they actually looking right now?' using available activity metadata, which may be incomplete or self-reported like days since last active and native platform activity.",
     icon: <Target size={24} className="text-pink-400" />,
     color: "pink"
   },
@@ -42,7 +42,7 @@ const FEATURES = [
   { problem: "Ignores behavioral signals — dormant = active", solution: "Intent Scoring — recent activity boosts rank" },
   { problem: "No career trajectory view", solution: "Trajectory Momentum — detects upward career velocity" },
   { problem: "Open stack — runs locally, zero licensing cost", solution: "Enterprise-ready — fully local, no vendor lock-in" },
-  { problem: "Fooled by AI-inflated resumes", solution: "AI-Resistant Signals — metadata ChatGPT can't fake" },
+  { problem: "Fooled by AI-inflated resumes", solution: "Evidence-aware matching with source review" },
   { problem: "Manual recruiter outreach", solution: "Auto Outreach Drafts — personalised messages for top 5" }
 ];
 

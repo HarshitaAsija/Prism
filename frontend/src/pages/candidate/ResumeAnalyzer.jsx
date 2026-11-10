@@ -37,9 +37,7 @@ export default function ResumeAnalyzer({ onAnalysisFinished }) {
   };
 
   const handleFinish = () => {
-    // Generate a random high score between 75 and 96
-    const score = Math.floor(Math.random() * 22) + 75;
-    onAnalysisFinished(score, parsedData);
+    onAnalysisFinished(null, parsedData);
   };
 
   return (
@@ -48,7 +46,7 @@ export default function ResumeAnalyzer({ onAnalysisFinished }) {
         <FileText className="text-violet-400" size={18} />
         <div>
           <h2 className="text-lg font-bold text-slate-100">Resume Analyzer</h2>
-          <p className="text-[10px] text-slate-500">Upload your PDF resume to parse structured credentials via LLaMA-3.1-70B</p>
+          <p className="text-[10px] text-slate-500">Extract your skills and experience. Resume text is processed by the configured NVIDIA AI service.</p>
         </div>
       </div>
 
@@ -72,7 +70,7 @@ export default function ResumeAnalyzer({ onAnalysisFinished }) {
             </div>
             <div>
               <p className="text-xs font-semibold text-slate-300">
-                {loading ? 'Analyzing resume details...' : 'Drag and drop PDF resume'}
+                {loading ? 'Analyzing resume details...' : 'Choose a PDF resume'}
               </p>
               <p className="text-[10px] text-slate-500 mt-1">
                 {loading ? 'Running extraction engines...' : 'or click to browse local files'}
@@ -96,7 +94,7 @@ export default function ResumeAnalyzer({ onAnalysisFinished }) {
             <CheckCircle size={16} className="flex-shrink-0" />
             <div>
               <p className="font-semibold text-xs">Parsing Complete!</p>
-              <p className="text-[10px] opacity-80 mt-0.5">Prism has indexed your resume credentials inside the candidate database.</p>
+              <p className="text-[10px] opacity-80 mt-0.5">Your parsed profile has been saved.</p>
             </div>
           </div>
 

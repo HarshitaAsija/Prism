@@ -3,56 +3,27 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff, ArrowLeft, Lock, Mail, LogIn, Zap, CheckCircle2, Target, Rocket } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
-const ROLE_HINTS = {
-  recruiter: {
-    email: 'recruiter@prism.ai',
-    label: 'Recruiter',
-    color: '#14b8a6',
-    gradient: 'from-teal-500/20 to-teal-600/5',
-    border: 'border-teal-500/30',
-    icon: <Target size={24} />,
-    desc: 'Rank candidates, analyze JDs, generate outreach',
-  },
-  candidate: {
-    email: 'candidate@prism.ai',
-    label: 'Candidate',
-    color: '#8b5cf6',
-    gradient: 'from-violet-500/20 to-violet-600/5',
-    border: 'border-violet-500/30',
-    icon: <Rocket size={24} />,
-    desc: 'Build profile, analyze resume, track readiness',
-  }
-};
-
-export default function LoginPage({ onBack, onSuccess, defaultRole }) {
+export default function LoginPage({ onBack, onSuccess, onRegister }) {
   const { login } = useAuth();
-  const [email, setEmail]       = useState(defaultRole ? ROLE_HINTS[defaultRole].email : '');
-  const [password, setPassword] = useState('demo123');
+  const [email, setEmail]       = useState('');
+  const [password, setPassword] = useState('');
   const [showPw, setShowPw]     = useState(false);
   const [error, setError]       = useState('');
   const [loading, setLoading]   = useState(false);
-  const [activeRole, setActiveRole] = useState(defaultRole || null);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setLoading(true);
     try {
-      await new Promise(r => setTimeout(r, 500)); // simulate network
-      const user = login(email, password);
+      const user = await login(email, password);
       onSuccess(user);
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.status === 401 ? 'Invalid email or password.' : 'Sign in failed. Please check your details.');
     } finally {
       setLoading(false);
     }
-  };
-
-  const fillDemo = (role) => {
-    setActiveRole(role);
-    setEmail(ROLE_HINTS[role].email);
-    setPassword('demo123');
-    setError('');
   };
 
   return (
@@ -192,51 +163,6 @@ export default function LoginPage({ onBack, onSuccess, defaultRole }) {
           </div>
 
           <div className="glass rounded-3xl border border-white/8 overflow-hidden shadow-2xl bg-slate-900/60 backdrop-blur-xl">
-            {/* Demo Role Selector */}
-            <div className="p-6 pb-0">
-              <div className="text-[10px] text-slate-500 mb-3 font-bold uppercase tracking-widest text-center">
-                Quick Demo Access — Pick a Role
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {Object.entries(ROLE_HINTS).map(([role, h]) => (
-                  <button
-                    key={role}
-                    onClick={() => fillDemo(role)}
-                    className={`rounded-xl p-3 text-center transition-all duration-200 border group relative overflow-hidden
-                      ${activeRole === role ? h.border : 'border-slate-700/40 hover:border-slate-600/60'}`}
-                    style={{
-                      background: activeRole === role ? `${h.color}18` : 'rgba(255,255,255,0.02)',
-                    }}>
-                    {activeRole === role && (
-                      <CheckCircle2 size={12} className="absolute top-1.5 right-1.5" style={{ color: h.color }} />
-                    )}
-                    <div className="flex justify-center mb-1">{h.icon}</div>
-                    <div className="text-[11px] font-bold" style={{ color: activeRole === role ? h.color : '#94a3b8' }}>
-                      {h.label}
-                    </div>
-                  </button>
-                ))}
-              </div>
-
-              {activeRole && (
-                <motion.div
-                  key={activeRole}
-                  initial={{ opacity: 0, y: -4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="mt-2.5 px-3 py-2 rounded-xl text-[10px] text-slate-400 text-center"
-                  style={{ background: `${ROLE_HINTS[activeRole].color}0a` }}>
-                  {ROLE_HINTS[activeRole].desc}
-                </motion.div>
-              )}
-            </div>
-
-            {/* Divider */}
-            <div className="flex items-center gap-3 px-6 py-4">
-              <div className="flex-1 h-px bg-slate-700/50" />
-              <span className="text-[10px] text-slate-600 uppercase tracking-widest">or enter manually</span>
-              <div className="flex-1 h-px bg-slate-700/50" />
-            </div>
-
             {/* Form */}
             <form onSubmit={handleSubmit} className="px-6 pb-6 space-y-4">
               <div>
@@ -245,8 +171,8 @@ export default function LoginPage({ onBack, onSuccess, defaultRole }) {
                   <Mail size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                   <input
                     type="email"
-                    value={email}
-                    onChange={e => { setEmail(e.target.value); setActiveRole(null); }}
+                    aria-label="Email" value={email}
+                    onChange={e => setEmail(e.target.value)}
                     placeholder="you@company.com"
                     className="input-dark pl-9"
                     required
@@ -260,7 +186,7 @@ export default function LoginPage({ onBack, onSuccess, defaultRole }) {
                   <Lock size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
                   <input
                     type={showPw ? 'text' : 'password'}
-                    value={password}
+                    aria-label="Password" value={password}
                     onChange={e => setPassword(e.target.value)}
                     placeholder="••••••••"
                     className="input-dark pl-9 pr-10"
@@ -271,10 +197,7 @@ export default function LoginPage({ onBack, onSuccess, defaultRole }) {
                     {showPw ? <EyeOff size={14} /> : <Eye size={14} />}
                   </button>
                 </div>
-                <div className="text-[10px] text-slate-600 mt-1.5 text-right flex justify-between">
-                  <span className="cursor-pointer hover:text-slate-400 transition-colors">Forgot Password?</span>
-                  <span>Demo: <code className="text-teal-500 font-mono">demo123</code></span>
-                </div>
+
               </div>
 
               {error && (
@@ -297,6 +220,7 @@ export default function LoginPage({ onBack, onSuccess, defaultRole }) {
                 )}
               </button>
             </form>
+            <div className="px-6 pb-6 text-center text-sm"><button onClick={onRegister} className="text-teal-400">Create an account</button></div>
           </div>
         </motion.div>
       </div>

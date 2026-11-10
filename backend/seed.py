@@ -29,11 +29,31 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.95,
         "activity_score": 0.88,
         "career_history": [
-            {"title": "Senior Software Engineer", "company": "Flipkart", "start_date": "2022-01", "end_date": "present", "description": "Led backend microservices team handling 10M daily transactions. Python FastAPI PostgreSQL Redis"},
-            {"title": "Software Engineer", "company": "Ola", "start_date": "2019-07", "end_date": "2021-12", "description": "Ride-matching algorithms Python Django"},
-            {"title": "Junior Developer", "company": "Infosys", "start_date": "2017-07", "end_date": "2019-06", "description": "Java Spring Boot REST APIs"}
+            {
+                "title": "Senior Software Engineer",
+                "company": "Flipkart",
+                "start_date": "2022-01",
+                "end_date": "present",
+                "description": "Led backend microservices team handling 10M daily transactions. Python FastAPI PostgreSQL Redis",
+            },
+            {
+                "title": "Software Engineer",
+                "company": "Ola",
+                "start_date": "2019-07",
+                "end_date": "2021-12",
+                "description": "Ride-matching algorithms Python Django",
+            },
+            {
+                "title": "Junior Developer",
+                "company": "Infosys",
+                "start_date": "2017-07",
+                "end_date": "2019-06",
+                "description": "Java Spring Boot REST APIs",
+            },
         ],
-        "education": [{"degree": "B.Tech", "field": "Computer Science", "school": "IIT Bombay", "year": 2017}],
+        "education": [
+            {"degree": "B.Tech", "field": "Computer Science", "school": "IIT Bombay", "year": 2017}
+        ],
         "headline": "Senior Backend Developer | Python & Distributed Systems Specialist",
         "summary": "Experienced backend engineer focused on building highly scalable microservices, relational databases, and cloud infrastructure.",
         "country": "India",
@@ -41,7 +61,11 @@ CANDIDATES_DATA = [
         "current_industry": "E-Commerce",
         "certifications": "AWS Certified Solutions Architect",
         "languages": "English;Hindi",
-        "redrob_signals": {"github_activity_score": 88, "profile_completeness_score": 95, "last_active_date": "2026-06-15"}
+        "redrob_signals": {
+            "github_activity_score": 88,
+            "profile_completeness_score": 95,
+            "last_active_date": "2026-06-15",
+        },
     },
     {
         "candidate_id": "C002",
@@ -58,10 +82,24 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.92,
         "activity_score": 0.82,
         "career_history": [
-            {"title": "Data Scientist", "company": "Google", "start_date": "2021-03", "end_date": "present", "description": "NLP models for healthcare search. TensorFlow PyTorch Vertex AI"},
-            {"title": "Junior Data Scientist", "company": "Mu Sigma", "start_date": "2018-07", "end_date": "2021-02", "description": "Machine learning models for insurance fraud detection"}
+            {
+                "title": "Data Scientist",
+                "company": "Google",
+                "start_date": "2021-03",
+                "end_date": "present",
+                "description": "NLP models for healthcare search. TensorFlow PyTorch Vertex AI",
+            },
+            {
+                "title": "Junior Data Scientist",
+                "company": "Mu Sigma",
+                "start_date": "2018-07",
+                "end_date": "2021-02",
+                "description": "Machine learning models for insurance fraud detection",
+            },
         ],
-        "education": [{"degree": "M.Tech", "field": "Data Science", "school": "IIT Delhi", "year": 2018}],
+        "education": [
+            {"degree": "M.Tech", "field": "Data Science", "school": "IIT Delhi", "year": 2018}
+        ],
         "headline": "Data Scientist | NLP & Deep Learning Expert",
         "summary": "Specialist in designing and deploying deep learning models for natural language processing and clinical text analysis.",
         "country": "India",
@@ -69,7 +107,11 @@ CANDIDATES_DATA = [
         "current_industry": "Technology",
         "certifications": "Google Cloud Professional Data Engineer",
         "languages": "English;Malayalam;Tamil",
-        "redrob_signals": {"github_activity_score": 82, "profile_completeness_score": 92, "last_active_date": "2026-06-10"}
+        "redrob_signals": {
+            "github_activity_score": 82,
+            "profile_completeness_score": 92,
+            "last_active_date": "2026-06-10",
+        },
     },
     {
         "candidate_id": "C003",
@@ -86,10 +128,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.90,
         "activity_score": 0.91,
         "career_history": [
-            {"title": "Full Stack Developer", "company": "Razorpay", "start_date": "2022-04", "end_date": "present", "description": "Payment gateway frontend and backend React Node.js TypeScript GraphQL"},
-            {"title": "Frontend Developer", "company": "Swiggy", "start_date": "2020-01", "end_date": "2022-03", "description": "React Redux performance optimization consumer app"}
+            {
+                "title": "Full Stack Developer",
+                "company": "Razorpay",
+                "start_date": "2022-04",
+                "end_date": "present",
+                "description": "Payment gateway frontend and backend React Node.js TypeScript GraphQL",
+            },
+            {
+                "title": "Frontend Developer",
+                "company": "Swiggy",
+                "start_date": "2020-01",
+                "end_date": "2022-03",
+                "description": "React Redux performance optimization consumer app",
+            },
         ],
-        "education": [{"degree": "B.E.", "field": "Information Technology", "school": "VIT Vellore", "year": 2020}],
+        "education": [
+            {
+                "degree": "B.E.",
+                "field": "Information Technology",
+                "school": "VIT Vellore",
+                "year": 2020,
+            }
+        ],
         "headline": "Full Stack Engineer | React & Node.js Specialist",
         "summary": "Building modern fintech web applications with focus on performance, security, and rich interactive dashboards.",
         "country": "India",
@@ -97,7 +158,11 @@ CANDIDATES_DATA = [
         "current_industry": "FinTech",
         "certifications": "React Advanced Developer Certification",
         "languages": "English;Hindi;Gujarati",
-        "redrob_signals": {"github_activity_score": 91, "profile_completeness_score": 90, "last_active_date": "2026-06-18"}
+        "redrob_signals": {
+            "github_activity_score": 91,
+            "profile_completeness_score": 90,
+            "last_active_date": "2026-06-18",
+        },
     },
     {
         "candidate_id": "C004",
@@ -114,9 +179,17 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.75,
         "activity_score": 0.45,
         "career_history": [
-            {"title": "DevOps Engineer", "company": "Oracle", "start_date": "2017-07", "end_date": "present", "description": "CI/CD pipelines Kubernetes Docker Terraform AWS infrastructure"}
+            {
+                "title": "DevOps Engineer",
+                "company": "Oracle",
+                "start_date": "2017-07",
+                "end_date": "present",
+                "description": "CI/CD pipelines Kubernetes Docker Terraform AWS infrastructure",
+            }
         ],
-        "education": [{"degree": "B.Tech", "field": "Electronics", "school": "Pune University", "year": 2017}],
+        "education": [
+            {"degree": "B.Tech", "field": "Electronics", "school": "Pune University", "year": 2017}
+        ],
         "headline": "DevOps & Infrastructure Architect | Kubernetes & Cloud Specialist",
         "summary": "Passionate about automating software delivery pipelines, managing container orchestration, and multi-cloud infrastructure.",
         "country": "India",
@@ -124,7 +197,11 @@ CANDIDATES_DATA = [
         "current_industry": "IT Services",
         "certifications": "Certified Kubernetes Administrator (CKA)",
         "languages": "English;Marathi",
-        "redrob_signals": {"github_activity_score": 45, "profile_completeness_score": 75, "last_active_date": "2025-12-01"}
+        "redrob_signals": {
+            "github_activity_score": 45,
+            "profile_completeness_score": 75,
+            "last_active_date": "2025-12-01",
+        },
     },
     {
         "candidate_id": "C005",
@@ -141,12 +218,38 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.98,
         "activity_score": 0.95,
         "career_history": [
-            {"title": "Engineering Manager", "company": "PhonePe", "start_date": "2021-01", "end_date": "present", "description": "Managing 15-engineer team payments infrastructure 50M daily transactions"},
-            {"title": "Senior Software Engineer", "company": "Paytm", "start_date": "2018-06", "end_date": "2020-12", "description": "Payments backend Python microservices Kafka"},
-            {"title": "Software Engineer", "company": "MakeMyTrip", "start_date": "2015-07", "end_date": "2018-05", "description": "Booking systems Java Spring"},
-            {"title": "Junior Engineer", "company": "TCS", "start_date": "2013-07", "end_date": "2015-06", "description": "Java development enterprise applications"}
+            {
+                "title": "Engineering Manager",
+                "company": "PhonePe",
+                "start_date": "2021-01",
+                "end_date": "present",
+                "description": "Managing 15-engineer team payments infrastructure 50M daily transactions",
+            },
+            {
+                "title": "Senior Software Engineer",
+                "company": "Paytm",
+                "start_date": "2018-06",
+                "end_date": "2020-12",
+                "description": "Payments backend Python microservices Kafka",
+            },
+            {
+                "title": "Software Engineer",
+                "company": "MakeMyTrip",
+                "start_date": "2015-07",
+                "end_date": "2018-05",
+                "description": "Booking systems Java Spring",
+            },
+            {
+                "title": "Junior Engineer",
+                "company": "TCS",
+                "start_date": "2013-07",
+                "end_date": "2015-06",
+                "description": "Java development enterprise applications",
+            },
         ],
-        "education": [{"degree": "B.Tech", "field": "Computer Science", "school": "BITS Pilani", "year": 2013}],
+        "education": [
+            {"degree": "B.Tech", "field": "Computer Science", "school": "BITS Pilani", "year": 2013}
+        ],
         "headline": "Engineering Manager | Scalable Payments Infrastructure Leader",
         "summary": "Technical manager leading high-performance engineering teams. Expert in distributed databases, microservices, and high-throughput systems.",
         "country": "India",
@@ -154,7 +257,11 @@ CANDIDATES_DATA = [
         "current_industry": "FinTech",
         "certifications": "Scrum Alliance Certified Product Owner",
         "languages": "English;Hindi;Punjabi",
-        "redrob_signals": {"github_activity_score": 95, "profile_completeness_score": 98, "last_active_date": "2026-06-20"}
+        "redrob_signals": {
+            "github_activity_score": 95,
+            "profile_completeness_score": 98,
+            "last_active_date": "2026-06-20",
+        },
     },
     {
         "candidate_id": "C006",
@@ -171,10 +278,24 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.85,
         "activity_score": 0.72,
         "career_history": [
-            {"title": "Product Manager", "company": "Meesho", "start_date": "2021-08", "end_date": "present", "description": "Social commerce product 0 to 1 features grew GMV 3x"},
-            {"title": "Associate Product Manager", "company": "Nykaa", "start_date": "2019-06", "end_date": "2021-07", "description": "Beauty ecommerce checkout funnel optimization"}
+            {
+                "title": "Product Manager",
+                "company": "Meesho",
+                "start_date": "2021-08",
+                "end_date": "present",
+                "description": "Social commerce product 0 to 1 features grew GMV 3x",
+            },
+            {
+                "title": "Associate Product Manager",
+                "company": "Nykaa",
+                "start_date": "2019-06",
+                "end_date": "2021-07",
+                "description": "Beauty ecommerce checkout funnel optimization",
+            },
         ],
-        "education": [{"degree": "MBA", "field": "Marketing", "school": "IIM Ahmedabad", "year": 2019}],
+        "education": [
+            {"degree": "MBA", "field": "Marketing", "school": "IIM Ahmedabad", "year": 2019}
+        ],
         "headline": "Product Manager | E-commerce Funnel & Growth Specialist",
         "summary": "Data-driven product manager focused on optimizing purchase funnels, growth engineering, and customer acquisition campaigns.",
         "country": "India",
@@ -182,7 +303,11 @@ CANDIDATES_DATA = [
         "current_industry": "E-Commerce",
         "certifications": "Product School Certified Product Manager",
         "languages": "English;Hindi;Marathi",
-        "redrob_signals": {"github_activity_score": 72, "profile_completeness_score": 85, "last_active_date": "2026-06-01"}
+        "redrob_signals": {
+            "github_activity_score": 72,
+            "profile_completeness_score": 85,
+            "last_active_date": "2026-06-01",
+        },
     },
     {
         "candidate_id": "C007",
@@ -199,10 +324,24 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.88,
         "activity_score": 0.87,
         "career_history": [
-            {"title": "Backend Engineer", "company": "CRED", "start_date": "2023-01", "end_date": "present", "description": "Credit card rewards backend Go gRPC Kafka PostgreSQL"},
-            {"title": "Software Developer", "company": "Juspay", "start_date": "2020-07", "end_date": "2022-12", "description": "Payment routing engine Haskell Python"}
+            {
+                "title": "Backend Engineer",
+                "company": "CRED",
+                "start_date": "2023-01",
+                "end_date": "present",
+                "description": "Credit card rewards backend Go gRPC Kafka PostgreSQL",
+            },
+            {
+                "title": "Software Developer",
+                "company": "Juspay",
+                "start_date": "2020-07",
+                "end_date": "2022-12",
+                "description": "Payment routing engine Haskell Python",
+            },
         ],
-        "education": [{"degree": "B.Tech", "field": "Computer Science", "school": "NIT Trichy", "year": 2020}],
+        "education": [
+            {"degree": "B.Tech", "field": "Computer Science", "school": "NIT Trichy", "year": 2020}
+        ],
         "headline": "Go backend developer specializing in fast gRPC microservices",
         "summary": "3 years experience building fintech payment services and processing workflows using Go, Kafka, and Redis.",
         "country": "India",
@@ -210,7 +349,11 @@ CANDIDATES_DATA = [
         "current_industry": "FinTech",
         "certifications": "",
         "languages": "English;Tamil",
-        "redrob_signals": {"github_activity_score": 87, "profile_completeness_score": 88, "last_active_date": "2026-06-19"}
+        "redrob_signals": {
+            "github_activity_score": 87,
+            "profile_completeness_score": 88,
+            "last_active_date": "2026-06-19",
+        },
     },
     {
         "candidate_id": "C008",
@@ -227,10 +370,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.93,
         "activity_score": 0.79,
         "career_history": [
-            {"title": "ML Engineer", "company": "Amazon", "start_date": "2022-02", "end_date": "present", "description": "Recommendation systems PyTorch SageMaker serving 100M users"},
-            {"title": "Data Engineer", "company": "Walmart Labs", "start_date": "2019-08", "end_date": "2022-01", "description": "Data pipelines Spark Hadoop feature store"}
+            {
+                "title": "ML Engineer",
+                "company": "Amazon",
+                "start_date": "2022-02",
+                "end_date": "present",
+                "description": "Recommendation systems PyTorch SageMaker serving 100M users",
+            },
+            {
+                "title": "Data Engineer",
+                "company": "Walmart Labs",
+                "start_date": "2019-08",
+                "end_date": "2022-01",
+                "description": "Data pipelines Spark Hadoop feature store",
+            },
         ],
-        "education": [{"degree": "M.S.", "field": "Computer Science", "school": "IIIT Hyderabad", "year": 2019}],
+        "education": [
+            {
+                "degree": "M.S.",
+                "field": "Computer Science",
+                "school": "IIIT Hyderabad",
+                "year": 2019,
+            }
+        ],
         "headline": "Machine Learning Engineer | Recommendation Engine Architect",
         "summary": "Specialized in large-scale real-time recommendation engines, deep learning inference optimizations, and feature stores.",
         "country": "India",
@@ -238,7 +400,11 @@ CANDIDATES_DATA = [
         "current_industry": "Technology",
         "certifications": "",
         "languages": "English;Telugu",
-        "redrob_signals": {"github_activity_score": 79, "profile_completeness_score": 93, "last_active_date": "2026-05-28"}
+        "redrob_signals": {
+            "github_activity_score": 79,
+            "profile_completeness_score": 93,
+            "last_active_date": "2026-05-28",
+        },
     },
     {
         "candidate_id": "C009",
@@ -255,10 +421,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.70,
         "activity_score": 0.38,
         "career_history": [
-            {"title": "Security Engineer", "company": "Zomato", "start_date": "2021-03", "end_date": "present", "description": "Application security penetration testing SIEM incident response"},
-            {"title": "Security Analyst", "company": "Wipro", "start_date": "2018-07", "end_date": "2021-02", "description": "SOC analyst SIEM tools network security"}
+            {
+                "title": "Security Engineer",
+                "company": "Zomato",
+                "start_date": "2021-03",
+                "end_date": "present",
+                "description": "Application security penetration testing SIEM incident response",
+            },
+            {
+                "title": "Security Analyst",
+                "company": "Wipro",
+                "start_date": "2018-07",
+                "end_date": "2021-02",
+                "description": "SOC analyst SIEM tools network security",
+            },
         ],
-        "education": [{"degree": "B.Tech", "field": "Information Security", "school": "SRM University", "year": 2018}],
+        "education": [
+            {
+                "degree": "B.Tech",
+                "field": "Information Security",
+                "school": "SRM University",
+                "year": 2018,
+            }
+        ],
         "headline": "Information Security Specialist | Certified Ethical Hacker",
         "summary": "Securing web applications and cloud deployments. Expertise in vulnerability scans, threat modeling, and OWASP Top 10 remediation.",
         "country": "India",
@@ -266,7 +451,11 @@ CANDIDATES_DATA = [
         "current_industry": "FoodTech",
         "certifications": "Certified Ethical Hacker (CEH)",
         "languages": "English;Hindi",
-        "redrob_signals": {"github_activity_score": 38, "profile_completeness_score": 70, "last_active_date": "2025-08-15"}
+        "redrob_signals": {
+            "github_activity_score": 38,
+            "profile_completeness_score": 70,
+            "last_active_date": "2025-08-15",
+        },
     },
     {
         "candidate_id": "C010",
@@ -283,10 +472,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.91,
         "activity_score": 0.84,
         "career_history": [
-            {"title": "Senior Frontend Engineer", "company": "Groww", "start_date": "2022-06", "end_date": "present", "description": "Wealth management platform React TypeScript Next.js serving 10M investors"},
-            {"title": "Frontend Engineer", "company": "Zerodha", "start_date": "2019-10", "end_date": "2022-05", "description": "Trading dashboard React Redux real-time data WebSockets"}
+            {
+                "title": "Senior Frontend Engineer",
+                "company": "Groww",
+                "start_date": "2022-06",
+                "end_date": "present",
+                "description": "Wealth management platform React TypeScript Next.js serving 10M investors",
+            },
+            {
+                "title": "Frontend Engineer",
+                "company": "Zerodha",
+                "start_date": "2019-10",
+                "end_date": "2022-05",
+                "description": "Trading dashboard React Redux real-time data WebSockets",
+            },
         ],
-        "education": [{"degree": "B.E.", "field": "Computer Science", "school": "RV College of Engineering", "year": 2019}],
+        "education": [
+            {
+                "degree": "B.E.",
+                "field": "Computer Science",
+                "school": "RV College of Engineering",
+                "year": 2019,
+            }
+        ],
         "headline": "Senior Frontend Developer | React, Next.js & Performance Specialist",
         "summary": "Passionate about creating clean user interfaces and optimizing web applications for maximum load speed and responsiveness.",
         "country": "India",
@@ -294,7 +502,11 @@ CANDIDATES_DATA = [
         "current_industry": "FinTech",
         "certifications": "",
         "languages": "English;Hindi;Kannada",
-        "redrob_signals": {"github_activity_score": 84, "profile_completeness_score": 91, "last_active_date": "2026-06-17"}
+        "redrob_signals": {
+            "github_activity_score": 84,
+            "profile_completeness_score": 91,
+            "last_active_date": "2026-06-17",
+        },
     },
     # --- ADDING 40 MORE DETAILED CANDIDATES TO REACH EXACTLY 50 ---
     {
@@ -312,10 +524,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.96,
         "activity_score": 0.92,
         "career_history": [
-            {"title": "Staff Backend Engineer", "company": "Stripe", "start_date": "2021-08", "end_date": "present", "description": "Scaling checkout APIs and billing systems in Go and Ruby. Designing active-active replication models."},
-            {"title": "Senior Engineer", "company": "Uber", "start_date": "2017-06", "end_date": "2021-07", "description": "Developed dispatch microservices using Go and Cassandra."}
+            {
+                "title": "Staff Backend Engineer",
+                "company": "Stripe",
+                "start_date": "2021-08",
+                "end_date": "present",
+                "description": "Scaling checkout APIs and billing systems in Go and Ruby. Designing active-active replication models.",
+            },
+            {
+                "title": "Senior Engineer",
+                "company": "Uber",
+                "start_date": "2017-06",
+                "end_date": "2021-07",
+                "description": "Developed dispatch microservices using Go and Cassandra.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Computer Science", "school": "Stanford University", "year": 2017}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Computer Science",
+                "school": "Stanford University",
+                "year": 2017,
+            }
+        ],
         "headline": "Staff Engineer | Distributed Systems & High-Throughput APIs",
         "summary": "Over 9 years of designing robust payment systems and high-throughput microservices. Expert in Go, distributed consensus, and messaging pipelines.",
         "country": "United States",
@@ -323,7 +554,11 @@ CANDIDATES_DATA = [
         "current_industry": "FinTech",
         "certifications": "",
         "languages": "English",
-        "redrob_signals": {"github_activity_score": 92, "profile_completeness_score": 96, "last_active_date": "2026-06-22"}
+        "redrob_signals": {
+            "github_activity_score": 92,
+            "profile_completeness_score": 96,
+            "last_active_date": "2026-06-22",
+        },
     },
     {
         "candidate_id": "C012",
@@ -340,10 +575,24 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.94,
         "activity_score": 0.80,
         "career_history": [
-            {"title": "Lead Genomics Researcher", "company": "Flatiron Health", "start_date": "2020-03", "end_date": "present", "description": "Applying machine learning models on genetic profiles and cancer patient electronic health records."},
-            {"title": "Bioinformatics Analyst", "company": "Broad Institute", "start_date": "2018-05", "end_date": "2020-02", "description": "Processing sequencing data and variant call pipelines."}
+            {
+                "title": "Lead Genomics Researcher",
+                "company": "Flatiron Health",
+                "start_date": "2020-03",
+                "end_date": "present",
+                "description": "Applying machine learning models on genetic profiles and cancer patient electronic health records.",
+            },
+            {
+                "title": "Bioinformatics Analyst",
+                "company": "Broad Institute",
+                "start_date": "2018-05",
+                "end_date": "2020-02",
+                "description": "Processing sequencing data and variant call pipelines.",
+            },
         ],
-        "education": [{"degree": "Ph.D.", "field": "Bioinformatics", "school": "MIT", "year": 2018}],
+        "education": [
+            {"degree": "Ph.D.", "field": "Bioinformatics", "school": "MIT", "year": 2018}
+        ],
         "headline": "Ph.D. Bioinformatician | Machine Learning for Clinical Genomics",
         "summary": "Applying advanced machine learning models to petabyte-scale genomic and clinical trial datasets to accelerate cancer research.",
         "country": "United States",
@@ -351,7 +600,11 @@ CANDIDATES_DATA = [
         "current_industry": "Healthcare",
         "certifications": "",
         "languages": "English;French",
-        "redrob_signals": {"github_activity_score": 80, "profile_completeness_score": 94, "last_active_date": "2026-06-14"}
+        "redrob_signals": {
+            "github_activity_score": 80,
+            "profile_completeness_score": 94,
+            "last_active_date": "2026-06-14",
+        },
     },
     {
         "candidate_id": "C013",
@@ -368,10 +621,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.97,
         "activity_score": 0.89,
         "career_history": [
-            {"title": "Principal Architect", "company": "SaaSify", "start_date": "2019-10", "end_date": "present", "description": "Architected multi-tenant SaaS CRM core. Scaled from 10k to 5M daily active users."},
-            {"title": "Lead Architect", "company": "Accenture", "start_date": "2011-02", "end_date": "2019-09", "description": "Managed cloud migrations for enterprise financial clients."}
+            {
+                "title": "Principal Architect",
+                "company": "SaaSify",
+                "start_date": "2019-10",
+                "end_date": "present",
+                "description": "Architected multi-tenant SaaS CRM core. Scaled from 10k to 5M daily active users.",
+            },
+            {
+                "title": "Lead Architect",
+                "company": "Accenture",
+                "start_date": "2011-02",
+                "end_date": "2019-09",
+                "description": "Managed cloud migrations for enterprise financial clients.",
+            },
         ],
-        "education": [{"degree": "M.S.", "field": "Software Engineering", "school": "University of Rome", "year": 2011}],
+        "education": [
+            {
+                "degree": "M.S.",
+                "field": "Software Engineering",
+                "school": "University of Rome",
+                "year": 2011,
+            }
+        ],
         "headline": "Principal Architect | SaaS Core Multi-Tenancy Leader",
         "summary": "15+ years experience building highly configurable, scalable multi-tenant architectures, database clustering, and secure Azure integrations.",
         "country": "Italy",
@@ -379,7 +651,11 @@ CANDIDATES_DATA = [
         "current_industry": "SaaS",
         "certifications": "Azure Solutions Architect Expert",
         "languages": "English;Italian;Latin",
-        "redrob_signals": {"github_activity_score": 89, "profile_completeness_score": 97, "last_active_date": "2026-06-23"}
+        "redrob_signals": {
+            "github_activity_score": 89,
+            "profile_completeness_score": 97,
+            "last_active_date": "2026-06-23",
+        },
     },
     {
         "candidate_id": "C014",
@@ -396,10 +672,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.89,
         "activity_score": 0.90,
         "career_history": [
-            {"title": "React Frontend Developer", "company": "Yandex", "start_date": "2024-03", "end_date": "present", "description": "Building interactive product search pages and filters for Yandex Market."},
-            {"title": "Junior Frontend Dev", "company": "Ozon", "start_date": "2023-03", "end_date": "2024-02", "description": "Maintaining checkout forms and cart React components."}
+            {
+                "title": "React Frontend Developer",
+                "company": "Yandex",
+                "start_date": "2024-03",
+                "end_date": "present",
+                "description": "Building interactive product search pages and filters for Yandex Market.",
+            },
+            {
+                "title": "Junior Frontend Dev",
+                "company": "Ozon",
+                "start_date": "2023-03",
+                "end_date": "2024-02",
+                "description": "Maintaining checkout forms and cart React components.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Applied Mathematics", "school": "Moscow State University", "year": 2023}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Applied Mathematics",
+                "school": "Moscow State University",
+                "year": 2023,
+            }
+        ],
         "headline": "React Developer | Front-End & TypeScript Specialist",
         "summary": "Young frontend engineer passionate about building high-performance e-commerce interfaces and responsive web layouts.",
         "country": "Russia",
@@ -407,7 +702,11 @@ CANDIDATES_DATA = [
         "current_industry": "E-Commerce",
         "certifications": "",
         "languages": "English;Russian",
-        "redrob_signals": {"github_activity_score": 90, "profile_completeness_score": 89, "last_active_date": "2026-06-21"}
+        "redrob_signals": {
+            "github_activity_score": 90,
+            "profile_completeness_score": 89,
+            "last_active_date": "2026-06-21",
+        },
     },
     {
         "candidate_id": "C015",
@@ -424,10 +723,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.93,
         "activity_score": 0.77,
         "career_history": [
-            {"title": "Lead Game Developer", "company": "Square Enix", "start_date": "2020-04", "end_date": "present", "description": "Leading rendering engine optimization and multiplayer system architecture for AAA titles."},
-            {"title": "Game Developer", "company": "Capcom", "start_date": "2018-05", "end_date": "2020-03", "description": "C++ graphics programming and shader optimization."}
+            {
+                "title": "Lead Game Developer",
+                "company": "Square Enix",
+                "start_date": "2020-04",
+                "end_date": "present",
+                "description": "Leading rendering engine optimization and multiplayer system architecture for AAA titles.",
+            },
+            {
+                "title": "Game Developer",
+                "company": "Capcom",
+                "start_date": "2018-05",
+                "end_date": "2020-03",
+                "description": "C++ graphics programming and shader optimization.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Computer Graphics", "school": "Tokyo Institute of Technology", "year": 2018}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Computer Graphics",
+                "school": "Tokyo Institute of Technology",
+                "year": 2018,
+            }
+        ],
         "headline": "Lead Game Developer | C++ & Unreal Engine Graphics Expert",
         "summary": "Specialist in game engine mechanics, real-time shaders, 3D math, and high-performance multithreaded network programming.",
         "country": "Japan",
@@ -435,7 +753,11 @@ CANDIDATES_DATA = [
         "current_industry": "Gaming",
         "certifications": "",
         "languages": "English;Japanese",
-        "redrob_signals": {"github_activity_score": 77, "profile_completeness_score": 93, "last_active_date": "2026-06-11"}
+        "redrob_signals": {
+            "github_activity_score": 77,
+            "profile_completeness_score": 93,
+            "last_active_date": "2026-06-11",
+        },
     },
     {
         "candidate_id": "C016",
@@ -452,10 +774,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.90,
         "activity_score": 0.81,
         "career_history": [
-            {"title": "Network Software Engineer", "company": "Orange", "start_date": "2022-01", "end_date": "present", "description": "Optimizing packet processing pipelines using DPDK and writing custom Linux kernel networking modules."},
-            {"title": "Systems Developer", "company": "Alcatel-Lucent", "start_date": "2020-06", "end_date": "2021-12", "description": "Implemented routing protocols for embedded telecommunication hardware."}
+            {
+                "title": "Network Software Engineer",
+                "company": "Orange",
+                "start_date": "2022-01",
+                "end_date": "present",
+                "description": "Optimizing packet processing pipelines using DPDK and writing custom Linux kernel networking modules.",
+            },
+            {
+                "title": "Systems Developer",
+                "company": "Alcatel-Lucent",
+                "start_date": "2020-06",
+                "end_date": "2021-12",
+                "description": "Implemented routing protocols for embedded telecommunication hardware.",
+            },
         ],
-        "education": [{"degree": "M.S.", "field": "Telecommunications", "school": "Telecom Paris", "year": 2020}],
+        "education": [
+            {
+                "degree": "M.S.",
+                "field": "Telecommunications",
+                "school": "Telecom Paris",
+                "year": 2020,
+            }
+        ],
         "headline": "Network Engineer | Linux Kernel & DPDK Packet Processing Specialist",
         "summary": "Expert in telecommunication protocols, kernel programming, and optimizing packet routing systems for low-latency 5G setups.",
         "country": "France",
@@ -463,7 +804,11 @@ CANDIDATES_DATA = [
         "current_industry": "Telecommunications",
         "certifications": "CCIE Routing and Switching",
         "languages": "English;French;Spanish",
-        "redrob_signals": {"github_activity_score": 81, "profile_completeness_score": 90, "last_active_date": "2026-06-05"}
+        "redrob_signals": {
+            "github_activity_score": 81,
+            "profile_completeness_score": 90,
+            "last_active_date": "2026-06-05",
+        },
     },
     {
         "candidate_id": "C017",
@@ -480,10 +825,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.88,
         "activity_score": 0.65,
         "career_history": [
-            {"title": "HR Systems Lead", "company": "Workday", "start_date": "2021-04", "end_date": "present", "description": "Designing custom integration architectures and payroll APIs for Fortune 100 enterprise customers."},
-            {"title": "Senior Solutions Engineer", "company": "ADP", "start_date": "2019-03", "end_date": "2021-03", "description": "Configuring enterprise payroll databases and custom field mappings."}
+            {
+                "title": "HR Systems Lead",
+                "company": "Workday",
+                "start_date": "2021-04",
+                "end_date": "present",
+                "description": "Designing custom integration architectures and payroll APIs for Fortune 100 enterprise customers.",
+            },
+            {
+                "title": "Senior Solutions Engineer",
+                "company": "ADP",
+                "start_date": "2019-03",
+                "end_date": "2021-03",
+                "description": "Configuring enterprise payroll databases and custom field mappings.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Management Information Systems", "school": "University of Illinois", "year": 2019}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Management Information Systems",
+                "school": "University of Illinois",
+                "year": 2019,
+            }
+        ],
         "headline": "HR Systems Integration Lead | Workday & Enterprise SaaS Specialist",
         "summary": "7+ years bridging HR business operations and SaaS technology. Expert in Workday studio, custom payroll connectors, and data audits.",
         "country": "United States",
@@ -491,7 +855,11 @@ CANDIDATES_DATA = [
         "current_industry": "HR Tech",
         "certifications": "Workday Integration Certified Consultant",
         "languages": "English",
-        "redrob_signals": {"github_activity_score": 65, "profile_completeness_score": 88, "last_active_date": "2026-05-15"}
+        "redrob_signals": {
+            "github_activity_score": 65,
+            "profile_completeness_score": 88,
+            "last_active_date": "2026-05-15",
+        },
     },
     {
         "candidate_id": "C018",
@@ -508,10 +876,24 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.98,
         "activity_score": 0.94,
         "career_history": [
-            {"title": "Lead Security Researcher", "company": "Siemens", "start_date": "2020-09", "end_date": "present", "description": "Conducting vulnerability research on industrial IoT systems. Finding 0-days in firmware implementations."},
-            {"title": "Senior Security Consultant", "company": "NCC Group", "start_date": "2015-03", "end_date": "2020-08", "description": "Conducted external network red-teaming and code audits for financial institutions."}
+            {
+                "title": "Lead Security Researcher",
+                "company": "Siemens",
+                "start_date": "2020-09",
+                "end_date": "present",
+                "description": "Conducting vulnerability research on industrial IoT systems. Finding 0-days in firmware implementations.",
+            },
+            {
+                "title": "Senior Security Consultant",
+                "company": "NCC Group",
+                "start_date": "2015-03",
+                "end_date": "2020-08",
+                "description": "Conducted external network red-teaming and code audits for financial institutions.",
+            },
         ],
-        "education": [{"degree": "M.S.", "field": "Information Security", "school": "TU Munich", "year": 2015}],
+        "education": [
+            {"degree": "M.S.", "field": "Information Security", "school": "TU Munich", "year": 2015}
+        ],
         "headline": "Lead Security Researcher | Firmware Reverse Engineer & 0-Day Finder",
         "summary": "11+ years experience in vulnerability research, binary analysis, hardware hacking, and reverse engineering critical IoT infrastructure.",
         "country": "Germany",
@@ -519,7 +901,11 @@ CANDIDATES_DATA = [
         "current_industry": "Industrial Technology",
         "certifications": "Offensive Security Certified Expert (OSCE)",
         "languages": "English;German;Russian",
-        "redrob_signals": {"github_activity_score": 94, "profile_completeness_score": 98, "last_active_date": "2026-06-24"}
+        "redrob_signals": {
+            "github_activity_score": 94,
+            "profile_completeness_score": 98,
+            "last_active_date": "2026-06-24",
+        },
     },
     {
         "candidate_id": "C019",
@@ -536,10 +922,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.94,
         "activity_score": 0.96,
         "career_history": [
-            {"title": "Smart Contract Developer", "company": "ConsenSys", "start_date": "2023-01", "end_date": "present", "description": "Writing and auditing Solidity and Rust smart contracts for high-volume DeFi credit protocols."},
-            {"title": "Blockchain Engineer", "company": "TenX", "start_date": "2022-06", "end_date": "2022-12", "description": "Integrated cryptocurrency payments and wallet structures."}
+            {
+                "title": "Smart Contract Developer",
+                "company": "ConsenSys",
+                "start_date": "2023-01",
+                "end_date": "present",
+                "description": "Writing and auditing Solidity and Rust smart contracts for high-volume DeFi credit protocols.",
+            },
+            {
+                "title": "Blockchain Engineer",
+                "company": "TenX",
+                "start_date": "2022-06",
+                "end_date": "2022-12",
+                "description": "Integrated cryptocurrency payments and wallet structures.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Computer Science", "school": "National University of Singapore", "year": 2022}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Computer Science",
+                "school": "National University of Singapore",
+                "year": 2022,
+            }
+        ],
         "headline": "Smart Contract Engineer | Solidity, DeFi & Rust Cryptography Specialist",
         "summary": "Expert blockchain developer designing secure EVM smart contracts, gas optimization techniques, and multi-signature vaults.",
         "country": "Singapore",
@@ -547,7 +952,11 @@ CANDIDATES_DATA = [
         "current_industry": "Blockchain",
         "certifications": "ConsenSys Certified Blockchain Developer",
         "languages": "English;Mandarin",
-        "redrob_signals": {"github_activity_score": 96, "profile_completeness_score": 94, "last_active_date": "2026-06-25"}
+        "redrob_signals": {
+            "github_activity_score": 96,
+            "profile_completeness_score": 94,
+            "last_active_date": "2026-06-25",
+        },
     },
     {
         "candidate_id": "C020",
@@ -564,10 +973,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.87,
         "activity_score": 0.70,
         "career_history": [
-            {"title": "Operations Systems Specialist", "company": "LogiTech", "start_date": "2022-02", "end_date": "present", "description": "Designing vehicle route optimization algorithms using Python and Operations Research packages."},
-            {"title": "Logistics Analyst", "company": "DHL", "start_date": "2021-06", "end_date": "2022-01", "description": "Analyzing distribution hubs throughput and warehouse queue systems."}
+            {
+                "title": "Operations Systems Specialist",
+                "company": "LogiTech",
+                "start_date": "2022-02",
+                "end_date": "present",
+                "description": "Designing vehicle route optimization algorithms using Python and Operations Research packages.",
+            },
+            {
+                "title": "Logistics Analyst",
+                "company": "DHL",
+                "start_date": "2021-06",
+                "end_date": "2022-01",
+                "description": "Analyzing distribution hubs throughput and warehouse queue systems.",
+            },
         ],
-        "education": [{"degree": "M.S.", "field": "Operations Research", "school": "Polytechnic University of Madrid", "year": 2021}],
+        "education": [
+            {
+                "degree": "M.S.",
+                "field": "Operations Research",
+                "school": "Polytechnic University of Madrid",
+                "year": 2021,
+            }
+        ],
         "headline": "Operations Research Engineer | Routing & Warehouse Optimization Specialist",
         "summary": "Bridging mathematics and software engineering to solve logistics bottleneck, vehicle routing, and distribution networks challenges.",
         "country": "Spain",
@@ -575,7 +1003,11 @@ CANDIDATES_DATA = [
         "current_industry": "Logistics",
         "certifications": "",
         "languages": "English;Spanish",
-        "redrob_signals": {"github_activity_score": 70, "profile_completeness_score": 87, "last_active_date": "2026-06-03"}
+        "redrob_signals": {
+            "github_activity_score": 70,
+            "profile_completeness_score": 87,
+            "last_active_date": "2026-06-03",
+        },
     },
     {
         "candidate_id": "C021",
@@ -592,10 +1024,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.85,
         "activity_score": 0.75,
         "career_history": [
-            {"title": "LMS System Specialist", "company": "Eduroute", "start_date": "2023-04", "end_date": "present", "description": "Developing customized Moodle plug-ins and interactive dashboards using Laravel and Vue.js."},
-            {"title": "Full Stack Dev", "company": "Freelance", "start_date": "2022-06", "end_date": "2023-03", "description": "Built educational websites and homework portal software for local schools."}
+            {
+                "title": "LMS System Specialist",
+                "company": "Eduroute",
+                "start_date": "2023-04",
+                "end_date": "present",
+                "description": "Developing customized Moodle plug-ins and interactive dashboards using Laravel and Vue.js.",
+            },
+            {
+                "title": "Full Stack Dev",
+                "company": "Freelance",
+                "start_date": "2022-06",
+                "end_date": "2023-03",
+                "description": "Built educational websites and homework portal software for local schools.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Computer Engineering", "school": "Cheikh Anta Diop University", "year": 2022}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Computer Engineering",
+                "school": "Cheikh Anta Diop University",
+                "year": 2022,
+            }
+        ],
         "headline": "EdTech Laravel Developer | Moodle & Interactive LMS Specialist",
         "summary": "Specialized in customized learning management systems, student data reports, and interactive curriculum delivery features.",
         "country": "Senegal",
@@ -603,7 +1054,11 @@ CANDIDATES_DATA = [
         "current_industry": "Education",
         "certifications": "",
         "languages": "English;French;Wolof",
-        "redrob_signals": {"github_activity_score": 75, "profile_completeness_score": 85, "last_active_date": "2026-06-19"}
+        "redrob_signals": {
+            "github_activity_score": 75,
+            "profile_completeness_score": 85,
+            "last_active_date": "2026-06-19",
+        },
     },
     {
         "candidate_id": "C022",
@@ -620,10 +1075,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.94,
         "activity_score": 0.88,
         "career_history": [
-            {"title": "Senior AdTech Developer", "company": "Amazon", "start_date": "2022-05", "end_date": "present", "description": "Optimizing latency on Amazon Demand Side Platform (DSP). Processing bids under 10ms using Aerospike and Go."},
-            {"title": "Software Engineer", "company": "The Trade Desk", "start_date": "2019-06", "end_date": "2022-04", "description": "Maintained bidding pipeline databases and Kafka log consumers."}
+            {
+                "title": "Senior AdTech Developer",
+                "company": "Amazon",
+                "start_date": "2022-05",
+                "end_date": "present",
+                "description": "Optimizing latency on Amazon Demand Side Platform (DSP). Processing bids under 10ms using Aerospike and Go.",
+            },
+            {
+                "title": "Software Engineer",
+                "company": "The Trade Desk",
+                "start_date": "2019-06",
+                "end_date": "2022-04",
+                "description": "Maintained bidding pipeline databases and Kafka log consumers.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Computer Science", "school": "University of Washington", "year": 2019}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Computer Science",
+                "school": "University of Washington",
+                "year": 2019,
+            }
+        ],
         "headline": "Senior AdTech Engineer | Real-Time Bidding & Low Latency Specialist",
         "summary": "7+ years building low-latency bidding engines, data pipelines, and highly available caching layers for DSP/SSP networks.",
         "country": "United States",
@@ -631,7 +1105,11 @@ CANDIDATES_DATA = [
         "current_industry": "Advertising",
         "certifications": "",
         "languages": "English",
-        "redrob_signals": {"github_activity_score": 88, "profile_completeness_score": 94, "last_active_date": "2026-06-20"}
+        "redrob_signals": {
+            "github_activity_score": 88,
+            "profile_completeness_score": 94,
+            "last_active_date": "2026-06-20",
+        },
     },
     {
         "candidate_id": "C023",
@@ -648,10 +1126,24 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.91,
         "activity_score": 0.82,
         "career_history": [
-            {"title": "Senior Data Analyst", "company": "Nexi", "start_date": "2021-09", "end_date": "present", "description": "Designing automated transaction fraud alerts and conducting weekly A/B tests for payment screens."},
-            {"title": "Business Analyst", "company": "Unicredit", "start_date": "2020-01", "end_date": "2021-08", "description": "Created visual dashboard portfolios for loan approvals."}
+            {
+                "title": "Senior Data Analyst",
+                "company": "Nexi",
+                "start_date": "2021-09",
+                "end_date": "present",
+                "description": "Designing automated transaction fraud alerts and conducting weekly A/B tests for payment screens.",
+            },
+            {
+                "title": "Business Analyst",
+                "company": "Unicredit",
+                "start_date": "2020-01",
+                "end_date": "2021-08",
+                "description": "Created visual dashboard portfolios for loan approvals.",
+            },
         ],
-        "education": [{"degree": "M.S.", "field": "Statistics", "school": "University of Milan", "year": 2019}],
+        "education": [
+            {"degree": "M.S.", "field": "Statistics", "school": "University of Milan", "year": 2019}
+        ],
         "headline": "FinTech Data Analyst | A/B Testing & Tableau Expert",
         "summary": "Using statistical methods and visual reporting to identify checkout drop-off rates, optimize payment flows, and mitigate fraud risk.",
         "country": "Italy",
@@ -659,7 +1151,11 @@ CANDIDATES_DATA = [
         "current_industry": "FinTech",
         "certifications": "",
         "languages": "English;Italian",
-        "redrob_signals": {"github_activity_score": 82, "profile_completeness_score": 91, "last_active_date": "2026-06-22"}
+        "redrob_signals": {
+            "github_activity_score": 82,
+            "profile_completeness_score": 91,
+            "last_active_date": "2026-06-22",
+        },
     },
     {
         "candidate_id": "C024",
@@ -676,10 +1172,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.93,
         "activity_score": 0.85,
         "career_history": [
-            {"title": "Senior ML Engineer", "company": "Biogen", "start_date": "2022-01", "end_date": "present", "description": "Scaling genomic target discovery models. Deploying MLOps pipeline with Kubeflow and AWS."},
-            {"title": "Machine Learning Engineer", "company": "Novartis", "start_date": "2020-06", "end_date": "2021-12", "description": "Trained molecular simulation models."}
+            {
+                "title": "Senior ML Engineer",
+                "company": "Biogen",
+                "start_date": "2022-01",
+                "end_date": "present",
+                "description": "Scaling genomic target discovery models. Deploying MLOps pipeline with Kubeflow and AWS.",
+            },
+            {
+                "title": "Machine Learning Engineer",
+                "company": "Novartis",
+                "start_date": "2020-06",
+                "end_date": "2021-12",
+                "description": "Trained molecular simulation models.",
+            },
         ],
-        "education": [{"degree": "M.S.", "field": "Data Science", "school": "Harvard University", "year": 2020}],
+        "education": [
+            {
+                "degree": "M.S.",
+                "field": "Data Science",
+                "school": "Harvard University",
+                "year": 2020,
+            }
+        ],
         "headline": "Senior ML Engineer | Biotech & Clinical Target Discovery Specialist",
         "summary": "Specialist in machine learning platforms for bioinformatics, deep learning model deployments, and secure medical data management.",
         "country": "United States",
@@ -687,7 +1202,11 @@ CANDIDATES_DATA = [
         "current_industry": "Biotech",
         "certifications": "AWS Certified Machine Learning - Specialty",
         "languages": "English",
-        "redrob_signals": {"github_activity_score": 85, "profile_completeness_score": 93, "last_active_date": "2026-06-18"}
+        "redrob_signals": {
+            "github_activity_score": 85,
+            "profile_completeness_score": 93,
+            "last_active_date": "2026-06-18",
+        },
     },
     {
         "candidate_id": "C025",
@@ -704,10 +1223,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.92,
         "activity_score": 0.74,
         "career_history": [
-            {"title": "Lead Product Designer", "company": "SaaSify", "start_date": "2021-03", "end_date": "present", "description": "Designed design systems and layout tokens. Redesigned dashboard and reporting workspace."},
-            {"title": "Senior UX Designer", "company": "Miro", "start_date": "2018-09", "end_date": "2021-02", "description": "Led UX research and interface design for mobile applications."}
+            {
+                "title": "Lead Product Designer",
+                "company": "SaaSify",
+                "start_date": "2021-03",
+                "end_date": "present",
+                "description": "Designed design systems and layout tokens. Redesigned dashboard and reporting workspace.",
+            },
+            {
+                "title": "Senior UX Designer",
+                "company": "Miro",
+                "start_date": "2018-09",
+                "end_date": "2021-02",
+                "description": "Led UX research and interface design for mobile applications.",
+            },
         ],
-        "education": [{"degree": "B.A.", "field": "Interaction Design", "school": "Royal College of Art", "year": 2018}],
+        "education": [
+            {
+                "degree": "B.A.",
+                "field": "Interaction Design",
+                "school": "Royal College of Art",
+                "year": 2018,
+            }
+        ],
         "headline": "Lead UI/UX Product Designer | Design Systems Expert",
         "summary": "Creating intuitive workflows for B2B SaaS platforms. Experienced in user interviews, interface guidelines, and frontend handoffs.",
         "country": "United Kingdom",
@@ -715,7 +1253,11 @@ CANDIDATES_DATA = [
         "current_industry": "SaaS",
         "certifications": "",
         "languages": "English;German",
-        "redrob_signals": {"github_activity_score": 74, "profile_completeness_score": 92, "last_active_date": "2026-06-24"}
+        "redrob_signals": {
+            "github_activity_score": 74,
+            "profile_completeness_score": 92,
+            "last_active_date": "2026-06-24",
+        },
     },
     {
         "candidate_id": "C026",
@@ -732,10 +1274,24 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.88,
         "activity_score": 0.60,
         "career_history": [
-            {"title": "SEO & Growth Manager", "company": "Zalando", "start_date": "2022-04", "end_date": "present", "description": "Driving organic traffic strategies across EU domains. Increased search conversions by 40%."},
-            {"title": "Growth Hacker", "company": "About You", "start_date": "2021-01", "end_date": "2022-03", "description": "Managed landing page conversion optimizations and paid ad campaigns."}
+            {
+                "title": "SEO & Growth Manager",
+                "company": "Zalando",
+                "start_date": "2022-04",
+                "end_date": "present",
+                "description": "Driving organic traffic strategies across EU domains. Increased search conversions by 40%.",
+            },
+            {
+                "title": "Growth Hacker",
+                "company": "About You",
+                "start_date": "2021-01",
+                "end_date": "2022-03",
+                "description": "Managed landing page conversion optimizations and paid ad campaigns.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "E-Business", "school": "TU Berlin", "year": 2020}],
+        "education": [
+            {"degree": "B.S.", "field": "E-Business", "school": "TU Berlin", "year": 2020}
+        ],
         "headline": "E-Commerce SEO & Growth Hacker | Search Optimization Expert",
         "summary": "Bridging tech SEO and conversion rates. Expert in site crawling, meta frameworks, and analytical tools.",
         "country": "Germany",
@@ -743,7 +1299,11 @@ CANDIDATES_DATA = [
         "current_industry": "E-Commerce",
         "certifications": "Google Analytics Individual Qualification",
         "languages": "English;German",
-        "redrob_signals": {"github_activity_score": 60, "profile_completeness_score": 88, "last_active_date": "2026-06-15"}
+        "redrob_signals": {
+            "github_activity_score": 60,
+            "profile_completeness_score": 88,
+            "last_active_date": "2026-06-15",
+        },
     },
     {
         "candidate_id": "C027",
@@ -760,10 +1320,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.90,
         "activity_score": 0.83,
         "career_history": [
-            {"title": "Gameplay Programmer", "company": "Capcom", "start_date": "2022-04", "end_date": "present", "description": "Developing character movement physics and combat AI states for action titles."},
-            {"title": "Junior Programmer", "company": "Konami", "start_date": "2020-04", "end_date": "2022-03", "description": "Wrote UI scripts and save-load management states."}
+            {
+                "title": "Gameplay Programmer",
+                "company": "Capcom",
+                "start_date": "2022-04",
+                "end_date": "present",
+                "description": "Developing character movement physics and combat AI states for action titles.",
+            },
+            {
+                "title": "Junior Programmer",
+                "company": "Konami",
+                "start_date": "2020-04",
+                "end_date": "2022-03",
+                "description": "Wrote UI scripts and save-load management states.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Game Programming", "school": "Osaka University", "year": 2020}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Game Programming",
+                "school": "Osaka University",
+                "year": 2020,
+            }
+        ],
         "headline": "Gameplay & Physics C++ Programmer | Character AI Specialist",
         "summary": "Passionate about responsive game feel, complex state machines, physics integrations, and runtime performance profiling.",
         "country": "Japan",
@@ -771,7 +1350,11 @@ CANDIDATES_DATA = [
         "current_industry": "Gaming",
         "certifications": "",
         "languages": "English;Japanese",
-        "redrob_signals": {"github_activity_score": 83, "profile_completeness_score": 90, "last_active_date": "2026-06-20"}
+        "redrob_signals": {
+            "github_activity_score": 83,
+            "profile_completeness_score": 90,
+            "last_active_date": "2026-06-20",
+        },
     },
     {
         "candidate_id": "C028",
@@ -788,10 +1371,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.89,
         "activity_score": 0.68,
         "career_history": [
-            {"title": "Telecom Network Planner", "company": "Vodafone Egypt", "start_date": "2020-03", "end_date": "present", "description": "Planning radio access networks (RAN) and optimizing cell coverage nodes for urban expansions."},
-            {"title": "RF Engineer", "company": "Etisalat", "start_date": "2018-01", "end_date": "2020-02", "description": "RF survey and frequency interference investigations."}
+            {
+                "title": "Telecom Network Planner",
+                "company": "Vodafone Egypt",
+                "start_date": "2020-03",
+                "end_date": "present",
+                "description": "Planning radio access networks (RAN) and optimizing cell coverage nodes for urban expansions.",
+            },
+            {
+                "title": "RF Engineer",
+                "company": "Etisalat",
+                "start_date": "2018-01",
+                "end_date": "2020-02",
+                "description": "RF survey and frequency interference investigations.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Electronics & Communications", "school": "Cairo University", "year": 2017}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Electronics & Communications",
+                "school": "Cairo University",
+                "year": 2017,
+            }
+        ],
         "headline": "Radio Access Network (RAN) Engineer | 5G & LTE Coverage Specialist",
         "summary": "Experienced network engineer mapping RF signal coverage and microwave backhauls to ensure high cellular availability.",
         "country": "Egypt",
@@ -799,7 +1401,11 @@ CANDIDATES_DATA = [
         "current_industry": "Telecommunications",
         "certifications": "",
         "languages": "English;Arabic",
-        "redrob_signals": {"github_activity_score": 68, "profile_completeness_score": 89, "last_active_date": "2026-06-12"}
+        "redrob_signals": {
+            "github_activity_score": 68,
+            "profile_completeness_score": 89,
+            "last_active_date": "2026-06-12",
+        },
     },
     {
         "candidate_id": "C029",
@@ -816,10 +1422,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.86,
         "activity_score": 0.72,
         "career_history": [
-            {"title": "HR Analytics Consultant", "company": "Darwinbox", "start_date": "2022-09", "end_date": "present", "description": "Developing customized employee retention dashboards and metrics databases for clients."},
-            {"title": "HR Analyst", "company": "Gartner", "start_date": "2021-01", "end_date": "2022-08", "description": "Compiled reports on global hiring trends and talent metrics."}
+            {
+                "title": "HR Analytics Consultant",
+                "company": "Darwinbox",
+                "start_date": "2022-09",
+                "end_date": "present",
+                "description": "Developing customized employee retention dashboards and metrics databases for clients.",
+            },
+            {
+                "title": "HR Analyst",
+                "company": "Gartner",
+                "start_date": "2021-01",
+                "end_date": "2022-08",
+                "description": "Compiled reports on global hiring trends and talent metrics.",
+            },
         ],
-        "education": [{"degree": "B.A.", "field": "Human Resource Management", "school": "University of Denver", "year": 2020}],
+        "education": [
+            {
+                "degree": "B.A.",
+                "field": "Human Resource Management",
+                "school": "University of Denver",
+                "year": 2020,
+            }
+        ],
         "headline": "HR Data & KPI Analyst | Darwinbox Dashboard Specialist",
         "summary": "Bridging metrics and hiring teams. Expertise in database exports, custom reports, and predictive turnover analytics.",
         "country": "United States",
@@ -827,7 +1452,11 @@ CANDIDATES_DATA = [
         "current_industry": "HR Tech",
         "certifications": "",
         "languages": "English",
-        "redrob_signals": {"github_activity_score": 72, "profile_completeness_score": 86, "last_active_date": "2026-06-17"}
+        "redrob_signals": {
+            "github_activity_score": 72,
+            "profile_completeness_score": 86,
+            "last_active_date": "2026-06-17",
+        },
     },
     {
         "candidate_id": "C030",
@@ -844,10 +1473,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.94,
         "activity_score": 0.90,
         "career_history": [
-            {"title": "Senior Security Analyst", "company": "Rapid7", "start_date": "2022-06", "end_date": "present", "description": "Investigating complex network alerts, threat intelligence, and building automated Splunk playbooks."},
-            {"title": "SOC Analyst", "company": "IBM", "start_date": "2020-02", "end_date": "2022-05", "description": "Monitored security event logs and isolated compromised servers."}
+            {
+                "title": "Senior Security Analyst",
+                "company": "Rapid7",
+                "start_date": "2022-06",
+                "end_date": "present",
+                "description": "Investigating complex network alerts, threat intelligence, and building automated Splunk playbooks.",
+            },
+            {
+                "title": "SOC Analyst",
+                "company": "IBM",
+                "start_date": "2020-02",
+                "end_date": "2022-05",
+                "description": "Monitored security event logs and isolated compromised servers.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Cybersecurity", "school": "Northeastern University", "year": 2019}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Cybersecurity",
+                "school": "Northeastern University",
+                "year": 2019,
+            }
+        ],
         "headline": "Senior Incident Responder | threat hunter & Splunk playbook engineer",
         "summary": "6+ years defending enterprise networks. Specialist in forensic log audits, network packet inspections, and rapid incident quarantine.",
         "country": "United States",
@@ -855,7 +1503,11 @@ CANDIDATES_DATA = [
         "current_industry": "Cybersecurity",
         "certifications": "GIAC Certified Incident Handler (GCIH)",
         "languages": "English",
-        "redrob_signals": {"github_activity_score": 90, "profile_completeness_score": 94, "last_active_date": "2026-06-25"}
+        "redrob_signals": {
+            "github_activity_score": 90,
+            "profile_completeness_score": 94,
+            "last_active_date": "2026-06-25",
+        },
     },
     {
         "candidate_id": "C031",
@@ -872,10 +1524,24 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.93,
         "activity_score": 0.95,
         "career_history": [
-            {"title": "Solidity Auditor", "company": "Trail of Bits", "start_date": "2023-03", "end_date": "present", "description": "Conducting smart contract audits, verifying contract invariance using Slither and Echidna fuzzers."},
-            {"title": "Smart Contract Developer", "company": "Aave", "start_date": "2021-05", "end_date": "2023-02", "description": "Developed lending pool mechanisms and liquidity algorithms."}
+            {
+                "title": "Solidity Auditor",
+                "company": "Trail of Bits",
+                "start_date": "2023-03",
+                "end_date": "present",
+                "description": "Conducting smart contract audits, verifying contract invariance using Slither and Echidna fuzzers.",
+            },
+            {
+                "title": "Smart Contract Developer",
+                "company": "Aave",
+                "start_date": "2021-05",
+                "end_date": "2023-02",
+                "description": "Developed lending pool mechanisms and liquidity algorithms.",
+            },
         ],
-        "education": [{"degree": "M.S.", "field": "Cryptography", "school": "ENS Lyon", "year": 2021}],
+        "education": [
+            {"degree": "M.S.", "field": "Cryptography", "school": "ENS Lyon", "year": 2021}
+        ],
         "headline": "Smart Contract Security Auditor | Slither & Echidna Expert",
         "summary": "Securing web3 codebases. Highly skilled in fuzzing, mathematical invariants, and exploit proof-of-concepts.",
         "country": "France",
@@ -883,7 +1549,11 @@ CANDIDATES_DATA = [
         "current_industry": "Cybersecurity",
         "certifications": "",
         "languages": "English;French",
-        "redrob_signals": {"github_activity_score": 95, "profile_completeness_score": 93, "last_active_date": "2026-06-21"}
+        "redrob_signals": {
+            "github_activity_score": 95,
+            "profile_completeness_score": 93,
+            "last_active_date": "2026-06-21",
+        },
     },
     {
         "candidate_id": "C032",
@@ -900,10 +1570,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.88,
         "activity_score": 0.78,
         "career_history": [
-            {"title": "Logistics Route Optimizer", "company": "Farfetch", "start_date": "2022-09", "end_date": "present", "description": "Optimizing last-mile carrier routes and delivery delays across global distribution hubs."},
-            {"title": "Supply Chain Analyst", "company": "Lidl", "start_date": "2020-07", "end_date": "2022-08", "description": "Monitored supply ship delays and storage metrics."}
+            {
+                "title": "Logistics Route Optimizer",
+                "company": "Farfetch",
+                "start_date": "2022-09",
+                "end_date": "present",
+                "description": "Optimizing last-mile carrier routes and delivery delays across global distribution hubs.",
+            },
+            {
+                "title": "Supply Chain Analyst",
+                "company": "Lidl",
+                "start_date": "2020-07",
+                "end_date": "2022-08",
+                "description": "Monitored supply ship delays and storage metrics.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Industrial Engineering", "school": "University of Lisbon", "year": 2020}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Industrial Engineering",
+                "school": "University of Lisbon",
+                "year": 2020,
+            }
+        ],
         "headline": "Supply Chain Analytics Engineer | Routing & Last-Mile Optimizer",
         "summary": "Specialist in building spatial dashboards and carrier performance models using Python and GIS libraries.",
         "country": "Portugal",
@@ -911,7 +1600,11 @@ CANDIDATES_DATA = [
         "current_industry": "Logistics",
         "certifications": "",
         "languages": "English;Portuguese;Spanish",
-        "redrob_signals": {"github_activity_score": 78, "profile_completeness_score": 88, "last_active_date": "2026-06-19"}
+        "redrob_signals": {
+            "github_activity_score": 78,
+            "profile_completeness_score": 88,
+            "last_active_date": "2026-06-19",
+        },
     },
     {
         "candidate_id": "C033",
@@ -928,10 +1621,24 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.86,
         "activity_score": 0.82,
         "career_history": [
-            {"title": "EdTech Backend Dev", "company": "Lingooda", "start_date": "2023-05", "end_date": "present", "description": "Implementing WebSockets for real-time online classes and classroom metrics. Scaling Stripe payment layers."},
-            {"title": "Backend Developer", "company": "Avast", "start_date": "2021-07", "end_date": "2023-04", "description": "Maintained threat databases backend components."}
+            {
+                "title": "EdTech Backend Dev",
+                "company": "Lingooda",
+                "start_date": "2023-05",
+                "end_date": "present",
+                "description": "Implementing WebSockets for real-time online classes and classroom metrics. Scaling Stripe payment layers.",
+            },
+            {
+                "title": "Backend Developer",
+                "company": "Avast",
+                "start_date": "2021-07",
+                "end_date": "2023-04",
+                "description": "Maintained threat databases backend components.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Informatics", "school": "Charles University", "year": 2021}],
+        "education": [
+            {"degree": "B.S.", "field": "Informatics", "school": "Charles University", "year": 2021}
+        ],
         "headline": "Django Backend Engineer | WebSockets & Stripe Billing Specialist",
         "summary": "3 years experience developing backend architectures for consumer web services, real-time channels, and subscription billing models.",
         "country": "Czech Republic",
@@ -939,7 +1646,11 @@ CANDIDATES_DATA = [
         "current_industry": "Education",
         "certifications": "",
         "languages": "English;Czech",
-        "redrob_signals": {"github_activity_score": 82, "profile_completeness_score": 86, "last_active_date": "2026-06-10"}
+        "redrob_signals": {
+            "github_activity_score": 82,
+            "profile_completeness_score": 86,
+            "last_active_date": "2026-06-10",
+        },
     },
     {
         "candidate_id": "C034",
@@ -956,10 +1667,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.91,
         "activity_score": 0.87,
         "career_history": [
-            {"title": "AdTech Frontend Engineer", "company": "AppLovin", "start_date": "2022-03", "end_date": "present", "description": "Building interactive ad visualizer components, real-time report dashboards using React and Canvas API."},
-            {"title": "Frontend Engineer", "company": "Taboola", "start_date": "2020-01", "end_date": "2022-02", "description": "Implemented publisher widget widgets and script payloads."}
+            {
+                "title": "AdTech Frontend Engineer",
+                "company": "AppLovin",
+                "start_date": "2022-03",
+                "end_date": "present",
+                "description": "Building interactive ad visualizer components, real-time report dashboards using React and Canvas API.",
+            },
+            {
+                "title": "Frontend Engineer",
+                "company": "Taboola",
+                "start_date": "2020-01",
+                "end_date": "2022-02",
+                "description": "Implemented publisher widget widgets and script payloads.",
+            },
         ],
-        "education": [{"degree": "B.A.", "field": "Creative Technologies", "school": "University of Texas", "year": 2019}],
+        "education": [
+            {
+                "degree": "B.A.",
+                "field": "Creative Technologies",
+                "school": "University of Texas",
+                "year": 2019,
+            }
+        ],
         "headline": "Frontend AdTech Developer | React, Canvas & Web Data Visualization Expert",
         "summary": "Building data dashboards for high-traffic networks. Expert in DOM scripting, interactive canvas rendering, and CSS optimizations.",
         "country": "United States",
@@ -967,7 +1697,11 @@ CANDIDATES_DATA = [
         "current_industry": "Advertising",
         "certifications": "",
         "languages": "English;Spanish",
-        "redrob_signals": {"github_activity_score": 87, "profile_completeness_score": 91, "last_active_date": "2026-06-23"}
+        "redrob_signals": {
+            "github_activity_score": 87,
+            "profile_completeness_score": 91,
+            "last_active_date": "2026-06-23",
+        },
     },
     {
         "candidate_id": "C035",
@@ -984,9 +1718,22 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.80,
         "activity_score": 0.50,
         "career_history": [
-            {"title": "Full Stack Dev", "company": "BillDesk", "start_date": "2019-07", "end_date": "present", "description": "Maintaining banking merchant transaction services and core Angular panels."}
+            {
+                "title": "Full Stack Dev",
+                "company": "BillDesk",
+                "start_date": "2019-07",
+                "end_date": "present",
+                "description": "Maintaining banking merchant transaction services and core Angular panels.",
+            }
         ],
-        "education": [{"degree": "B.E.", "field": "Computer Engineering", "school": "Gujarat Technological University", "year": 2019}],
+        "education": [
+            {
+                "degree": "B.E.",
+                "field": "Computer Engineering",
+                "school": "Gujarat Technological University",
+                "year": 2019,
+            }
+        ],
         "headline": "Java Spring Boot & Angular Full Stack Engineer",
         "summary": "Experienced enterprise system developer managing Oracle transactions, Spring microservices, and client portals.",
         "country": "India",
@@ -994,7 +1741,11 @@ CANDIDATES_DATA = [
         "current_industry": "FinTech",
         "certifications": "",
         "languages": "English;Gujarati;Hindi",
-        "redrob_signals": {"github_activity_score": 50, "profile_completeness_score": 80, "last_active_date": "2026-05-10"}
+        "redrob_signals": {
+            "github_activity_score": 50,
+            "profile_completeness_score": 80,
+            "last_active_date": "2026-05-10",
+        },
     },
     {
         "candidate_id": "C036",
@@ -1011,9 +1762,22 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.85,
         "activity_score": 0.70,
         "career_history": [
-            {"title": "Clinical Research Coordinator", "company": "AstraZeneca", "start_date": "2022-04", "end_date": "present", "description": "Ensuring patient database accuracy and clinical trials validation metrics."}
+            {
+                "title": "Clinical Research Coordinator",
+                "company": "AstraZeneca",
+                "start_date": "2022-04",
+                "end_date": "present",
+                "description": "Ensuring patient database accuracy and clinical trials validation metrics.",
+            }
         ],
-        "education": [{"degree": "B.S.", "field": "Biomedical Sciences", "school": "Cambridge University", "year": 2021}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Biomedical Sciences",
+                "school": "Cambridge University",
+                "year": 2021,
+            }
+        ],
         "headline": "Clinical Data Specialist | AstraZeneca Trial Systems Coordinator",
         "summary": "Specialist in managing clinical protocol data, clinical database entries, and patient data audit operations.",
         "country": "United Kingdom",
@@ -1021,7 +1785,11 @@ CANDIDATES_DATA = [
         "current_industry": "Healthcare",
         "certifications": "",
         "languages": "English",
-        "redrob_signals": {"github_activity_score": 70, "profile_completeness_score": 85, "last_active_date": "2026-06-16"}
+        "redrob_signals": {
+            "github_activity_score": 70,
+            "profile_completeness_score": 85,
+            "last_active_date": "2026-06-16",
+        },
     },
     {
         "candidate_id": "C037",
@@ -1038,10 +1806,24 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.92,
         "activity_score": 0.79,
         "career_history": [
-            {"title": "Senior Solutions Engineer", "company": "HubSpot", "start_date": "2020-03", "end_date": "present", "description": "Developing custom marketing workflow connectors, pipeline webhooks, and technical presales mappings."},
-            {"title": "Solutions Engineer", "company": "Salesforce", "start_date": "2018-05", "end_date": "2020-02", "description": "Mapped custom field solutions for large enterprises."}
+            {
+                "title": "Senior Solutions Engineer",
+                "company": "HubSpot",
+                "start_date": "2020-03",
+                "end_date": "present",
+                "description": "Developing custom marketing workflow connectors, pipeline webhooks, and technical presales mappings.",
+            },
+            {
+                "title": "Solutions Engineer",
+                "company": "Salesforce",
+                "start_date": "2018-05",
+                "end_date": "2020-02",
+                "description": "Mapped custom field solutions for large enterprises.",
+            },
         ],
-        "education": [{"degree": "B.A.", "field": "Economics", "school": "Boston College", "year": 2018}],
+        "education": [
+            {"degree": "B.A.", "field": "Economics", "school": "Boston College", "year": 2018}
+        ],
         "headline": "SaaS Solutions Architect | HubSpot custom integrations & workflow specialist",
         "summary": "Expert in connecting business sales systems, building custom API middlewares, and delivering technical solution layouts.",
         "country": "United States",
@@ -1049,7 +1831,11 @@ CANDIDATES_DATA = [
         "current_industry": "SaaS",
         "certifications": "",
         "languages": "English",
-        "redrob_signals": {"github_activity_score": 79, "profile_completeness_score": 92, "last_active_date": "2026-06-24"}
+        "redrob_signals": {
+            "github_activity_score": 79,
+            "profile_completeness_score": 92,
+            "last_active_date": "2026-06-24",
+        },
     },
     {
         "candidate_id": "C038",
@@ -1066,10 +1852,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.98,
         "activity_score": 0.96,
         "career_history": [
-            {"title": "Frontend Architect", "company": "Farfetch", "start_date": "2019-09", "end_date": "present", "description": "Architecting micro-frontend setups and building company-wide design tokens systems. Leading 10 frontend developers."},
-            {"title": "Lead Dev", "company": "ASOS", "start_date": "2015-04", "end_date": "2019-08", "description": "Built customized layout modules and search widgets."}
+            {
+                "title": "Frontend Architect",
+                "company": "Farfetch",
+                "start_date": "2019-09",
+                "end_date": "present",
+                "description": "Architecting micro-frontend setups and building company-wide design tokens systems. Leading 10 frontend developers.",
+            },
+            {
+                "title": "Lead Dev",
+                "company": "ASOS",
+                "start_date": "2015-04",
+                "end_date": "2019-08",
+                "description": "Built customized layout modules and search widgets.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Computer Science", "school": "Imperial College London", "year": 2015}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Computer Science",
+                "school": "Imperial College London",
+                "year": 2015,
+            }
+        ],
         "headline": "Frontend Architect | Micro-Frontends & Design Systems Leader",
         "summary": "11+ years guiding frontend architecture. Focused on scalable components, micro-frontend routing, and web accessibility.",
         "country": "United Kingdom",
@@ -1077,7 +1882,11 @@ CANDIDATES_DATA = [
         "current_industry": "E-Commerce",
         "certifications": "",
         "languages": "English;French",
-        "redrob_signals": {"github_activity_score": 96, "profile_completeness_score": 98, "last_active_date": "2026-06-25"}
+        "redrob_signals": {
+            "github_activity_score": 96,
+            "profile_completeness_score": 98,
+            "last_active_date": "2026-06-25",
+        },
     },
     {
         "candidate_id": "C039",
@@ -1094,10 +1903,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.99,
         "activity_score": 0.90,
         "career_history": [
-            {"title": "Creative Director", "company": "Kojima Productions", "start_date": "2015-12", "end_date": "present", "description": "Directing complex AAA titles, managing 150 developers, game narrative design, engine selections."},
-            {"title": "Director / Lead Designer", "company": "Konami", "start_date": "2000-01", "end_date": "2015-11", "description": "Designed stealth action franchises."}
+            {
+                "title": "Creative Director",
+                "company": "Kojima Productions",
+                "start_date": "2015-12",
+                "end_date": "present",
+                "description": "Directing complex AAA titles, managing 150 developers, game narrative design, engine selections.",
+            },
+            {
+                "title": "Director / Lead Designer",
+                "company": "Konami",
+                "start_date": "2000-01",
+                "end_date": "2015-11",
+                "description": "Designed stealth action franchises.",
+            },
         ],
-        "education": [{"degree": "B.A.", "field": "Media Studies", "school": "Waseda University", "year": 1986}],
+        "education": [
+            {
+                "degree": "B.A.",
+                "field": "Media Studies",
+                "school": "Waseda University",
+                "year": 1986,
+            }
+        ],
         "headline": "AAA Game Creative Director | Narrative & System Design Pioneer",
         "summary": "Industry veteran leading game design, storytelling structures, C++ physics architectures, and international development studios.",
         "country": "Japan",
@@ -1105,7 +1933,11 @@ CANDIDATES_DATA = [
         "current_industry": "Gaming",
         "certifications": "",
         "languages": "English;Japanese",
-        "redrob_signals": {"github_activity_score": 90, "profile_completeness_score": 99, "last_active_date": "2026-06-25"}
+        "redrob_signals": {
+            "github_activity_score": 90,
+            "profile_completeness_score": 99,
+            "last_active_date": "2026-06-25",
+        },
     },
     {
         "candidate_id": "C040",
@@ -1122,10 +1954,24 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.97,
         "activity_score": 0.92,
         "career_history": [
-            {"title": "Principal Compiler Engineer", "company": "NVIDIA", "start_date": "2018-09", "end_date": "present", "description": "Developing optimizations for CUDA compilers and parallel programming LLVM backends."},
-            {"title": "Lead Compiler Dev", "company": "Intel", "start_date": "2012-06", "end_date": "2018-08", "description": "Worked on compiler vectorizations."}
+            {
+                "title": "Principal Compiler Engineer",
+                "company": "NVIDIA",
+                "start_date": "2018-09",
+                "end_date": "present",
+                "description": "Developing optimizations for CUDA compilers and parallel programming LLVM backends.",
+            },
+            {
+                "title": "Lead Compiler Dev",
+                "company": "Intel",
+                "start_date": "2012-06",
+                "end_date": "2018-08",
+                "description": "Worked on compiler vectorizations.",
+            },
         ],
-        "education": [{"degree": "Ph.D.", "field": "Mathematics", "school": "Yale University", "year": 2012}],
+        "education": [
+            {"degree": "Ph.D.", "field": "Mathematics", "school": "Yale University", "year": 2012}
+        ],
         "headline": "Principal Compiler Engineer | CUDA, LLVM & Parallel Computing Expert",
         "summary": "Specialist in binary optimizations, instruction layouts, and GPU compiler architectures.",
         "country": "United States",
@@ -1133,7 +1979,11 @@ CANDIDATES_DATA = [
         "current_industry": "Semiconductors",
         "certifications": "",
         "languages": "English",
-        "redrob_signals": {"github_activity_score": 92, "profile_completeness_score": 97, "last_active_date": "2026-06-25"}
+        "redrob_signals": {
+            "github_activity_score": 92,
+            "profile_completeness_score": 97,
+            "last_active_date": "2026-06-25",
+        },
     },
     {
         "candidate_id": "C041",
@@ -1150,9 +2000,22 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.99,
         "activity_score": 0.99,
         "career_history": [
-            {"title": "Principal Kernel Maintainer", "company": "Linux Foundation", "start_date": "2003-01", "end_date": "present", "description": "Reviewing and merging kernel patch integrations, coordinating global open source workflows, designing Git structures."}
+            {
+                "title": "Principal Kernel Maintainer",
+                "company": "Linux Foundation",
+                "start_date": "2003-01",
+                "end_date": "present",
+                "description": "Reviewing and merging kernel patch integrations, coordinating global open source workflows, designing Git structures.",
+            }
         ],
-        "education": [{"degree": "M.S.", "field": "Computer Science", "school": "University of Helsinki", "year": 1996}],
+        "education": [
+            {
+                "degree": "M.S.",
+                "field": "Computer Science",
+                "school": "University of Helsinki",
+                "year": 1996,
+            }
+        ],
         "headline": "Principal Linux Kernel Developer | Git & Open Source Pioneer",
         "summary": "Systems software expert specializing in kernel architectures, virtual memory allocation, filesystem designs, and software release management.",
         "country": "United States",
@@ -1160,7 +2023,11 @@ CANDIDATES_DATA = [
         "current_industry": "Non-Profit",
         "certifications": "",
         "languages": "English;Finnish;Swedish",
-        "redrob_signals": {"github_activity_score": 99, "profile_completeness_score": 99, "last_active_date": "2026-06-25"}
+        "redrob_signals": {
+            "github_activity_score": 99,
+            "profile_completeness_score": 99,
+            "last_active_date": "2026-06-25",
+        },
     },
     {
         "candidate_id": "C042",
@@ -1177,10 +2044,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.99,
         "activity_score": 0.98,
         "career_history": [
-            {"title": "Distinguished Engineer", "company": "Microsoft", "start_date": "2020-11", "end_date": "present", "description": "Improving CPython compiler speed and optimizing runtime libraries."},
-            {"title": "Principal Engineer", "company": "Dropbox", "start_date": "2013-01", "end_date": "2019-10", "description": "Managed cloud storage backend migrations."}
+            {
+                "title": "Distinguished Engineer",
+                "company": "Microsoft",
+                "start_date": "2020-11",
+                "end_date": "present",
+                "description": "Improving CPython compiler speed and optimizing runtime libraries.",
+            },
+            {
+                "title": "Principal Engineer",
+                "company": "Dropbox",
+                "start_date": "2013-01",
+                "end_date": "2019-10",
+                "description": "Managed cloud storage backend migrations.",
+            },
         ],
-        "education": [{"degree": "M.S.", "field": "Mathematics", "school": "University of Amsterdam", "year": 1982}],
+        "education": [
+            {
+                "degree": "M.S.",
+                "field": "Mathematics",
+                "school": "University of Amsterdam",
+                "year": 1982,
+            }
+        ],
         "headline": "Distinguished Python Software Engineer | Language Designer",
         "summary": "Creator of Python. Decades of experience in interpreter internals, language specs, compile layers, and enterprise cloud APIs.",
         "country": "United States",
@@ -1188,7 +2074,11 @@ CANDIDATES_DATA = [
         "current_industry": "Technology",
         "certifications": "",
         "languages": "English;Dutch",
-        "redrob_signals": {"github_activity_score": 98, "profile_completeness_score": 99, "last_active_date": "2026-06-25"}
+        "redrob_signals": {
+            "github_activity_score": 98,
+            "profile_completeness_score": 99,
+            "last_active_date": "2026-06-25",
+        },
     },
     {
         "candidate_id": "C043",
@@ -1205,9 +2095,22 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.85,
         "activity_score": 0.65,
         "career_history": [
-            {"title": "HR Specialist", "company": "Workday", "start_date": "2022-07", "end_date": "present", "description": "Maintaining candidate onboarding tables and employee benefit portals."}
+            {
+                "title": "HR Specialist",
+                "company": "Workday",
+                "start_date": "2022-07",
+                "end_date": "present",
+                "description": "Maintaining candidate onboarding tables and employee benefit portals.",
+            }
         ],
-        "education": [{"degree": "B.A.", "field": "Literature", "school": "Manchester University", "year": 2021}],
+        "education": [
+            {
+                "degree": "B.A.",
+                "field": "Literature",
+                "school": "Manchester University",
+                "year": 2021,
+            }
+        ],
         "headline": "HR Specialist | SaaS Onboarding Portal Coordinator",
         "summary": "Experienced in configuring HR database pipelines, client setup, and Workday analytics dashboard layouts.",
         "country": "United Kingdom",
@@ -1215,7 +2118,11 @@ CANDIDATES_DATA = [
         "current_industry": "HR Tech",
         "certifications": "",
         "languages": "English",
-        "redrob_signals": {"github_activity_score": 65, "profile_completeness_score": 85, "last_active_date": "2026-06-18"}
+        "redrob_signals": {
+            "github_activity_score": 65,
+            "profile_completeness_score": 85,
+            "last_active_date": "2026-06-18",
+        },
     },
     {
         "candidate_id": "C044",
@@ -1232,10 +2139,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.90,
         "activity_score": 0.80,
         "career_history": [
-            {"title": "Senior Solutions Engineer", "company": "Zendesk", "start_date": "2022-01", "end_date": "present", "description": "Developing custom chat widgets integrations, third-party webhook integrations, and client portal layouts."},
-            {"title": "Solutions Engineer", "company": "Freshworks", "start_date": "2020-02", "end_date": "2021-12", "description": "Built customer database connectors."}
+            {
+                "title": "Senior Solutions Engineer",
+                "company": "Zendesk",
+                "start_date": "2022-01",
+                "end_date": "present",
+                "description": "Developing custom chat widgets integrations, third-party webhook integrations, and client portal layouts.",
+            },
+            {
+                "title": "Solutions Engineer",
+                "company": "Freshworks",
+                "start_date": "2020-02",
+                "end_date": "2021-12",
+                "description": "Built customer database connectors.",
+            },
         ],
-        "education": [{"degree": "B.S.", "field": "Informatics", "school": "University of Washington", "year": 2019}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Informatics",
+                "school": "University of Washington",
+                "year": 2019,
+            }
+        ],
         "headline": "Senior Solutions Engineer | Zendesk Custom API Specialist",
         "summary": "Bridging business support channels and backend REST APIs. Specialist in ticket routing databases, webhooks, and customer success.",
         "country": "United States",
@@ -1243,7 +2169,11 @@ CANDIDATES_DATA = [
         "current_industry": "SaaS",
         "certifications": "",
         "languages": "English",
-        "redrob_signals": {"github_activity_score": 80, "profile_completeness_score": 90, "last_active_date": "2026-06-24"}
+        "redrob_signals": {
+            "github_activity_score": 80,
+            "profile_completeness_score": 90,
+            "last_active_date": "2026-06-24",
+        },
     },
     {
         "candidate_id": "C045",
@@ -1260,10 +2190,29 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.96,
         "activity_score": 0.95,
         "career_history": [
-            {"title": "Security Architect", "company": "Wayne Enterprises", "start_date": "2019-01", "end_date": "present", "description": "Leading secure operations centers (SOC), cloud deployment auditing, intrusion forensics, and encryption tools implementations."},
-            {"title": "Security Lead", "company": "Arkham Security", "start_date": "2015-04", "end_date": "2018-12", "description": "Designed hardware-level server encryption shields."}
+            {
+                "title": "Security Architect",
+                "company": "Wayne Enterprises",
+                "start_date": "2019-01",
+                "end_date": "present",
+                "description": "Leading secure operations centers (SOC), cloud deployment auditing, intrusion forensics, and encryption tools implementations.",
+            },
+            {
+                "title": "Security Lead",
+                "company": "Arkham Security",
+                "start_date": "2015-04",
+                "end_date": "2018-12",
+                "description": "Designed hardware-level server encryption shields.",
+            },
         ],
-        "education": [{"degree": "M.S.", "field": "Computer Science", "school": "Columbia University", "year": 2014}],
+        "education": [
+            {
+                "degree": "M.S.",
+                "field": "Computer Science",
+                "school": "Columbia University",
+                "year": 2014,
+            }
+        ],
         "headline": "Principal Security Architect | SOC Forensic & Intrusion Lead",
         "summary": "11+ years architecting zero-trust networks, server intrusion preventions, secure cloud deployments, and custom encryption standards.",
         "country": "United States",
@@ -1271,7 +2220,11 @@ CANDIDATES_DATA = [
         "current_industry": "Technology",
         "certifications": "CISSP",
         "languages": "English;Spanish;Japanese",
-        "redrob_signals": {"github_activity_score": 95, "profile_completeness_score": 96, "last_active_date": "2026-06-25"}
+        "redrob_signals": {
+            "github_activity_score": 95,
+            "profile_completeness_score": 96,
+            "last_active_date": "2026-06-25",
+        },
     },
     {
         "candidate_id": "C046",
@@ -1288,9 +2241,22 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.99,
         "activity_score": 0.99,
         "career_history": [
-            {"title": "Principal Researcher", "company": "Ethereum Foundation", "start_date": "2014-07", "end_date": "present", "description": "Designing proof-of-stake consensus protocols, EVM smart contract structures, cryptography layers, and sharding specifications."}
+            {
+                "title": "Principal Researcher",
+                "company": "Ethereum Foundation",
+                "start_date": "2014-07",
+                "end_date": "present",
+                "description": "Designing proof-of-stake consensus protocols, EVM smart contract structures, cryptography layers, and sharding specifications.",
+            }
         ],
-        "education": [{"degree": "Dr.h.c.", "field": "Computer Science", "school": "University of Basel", "year": 2018}],
+        "education": [
+            {
+                "degree": "Dr.h.c.",
+                "field": "Computer Science",
+                "school": "University of Basel",
+                "year": 2018,
+            }
+        ],
         "headline": "Principal Blockchain Researcher | EVM & Proof-of-Stake Architect",
         "summary": "Founder of Ethereum. Leading decentralization mechanics, game theory systems, Zero-Knowledge proofs, and EVM upgrades.",
         "country": "Canada",
@@ -1298,7 +2264,11 @@ CANDIDATES_DATA = [
         "current_industry": "Non-Profit",
         "certifications": "",
         "languages": "English;Russian;Mandarin",
-        "redrob_signals": {"github_activity_score": 99, "profile_completeness_score": 99, "last_active_date": "2026-06-25"}
+        "redrob_signals": {
+            "github_activity_score": 99,
+            "profile_completeness_score": 99,
+            "last_active_date": "2026-06-25",
+        },
     },
     {
         "candidate_id": "C047",
@@ -1315,9 +2285,17 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.98,
         "activity_score": 0.97,
         "career_history": [
-            {"title": "Principal Robotics Engineer", "company": "Stark Industries", "start_date": "2012-06", "end_date": "present", "description": "Designing high-performance embedded systems control boards, real-time signal processing modules, and IoT mesh networks."}
+            {
+                "title": "Principal Robotics Engineer",
+                "company": "Stark Industries",
+                "start_date": "2012-06",
+                "end_date": "present",
+                "description": "Designing high-performance embedded systems control boards, real-time signal processing modules, and IoT mesh networks.",
+            }
         ],
-        "education": [{"degree": "Ph.D.", "field": "Electrical Engineering", "school": "MIT", "year": 2010}],
+        "education": [
+            {"degree": "Ph.D.", "field": "Electrical Engineering", "school": "MIT", "year": 2010}
+        ],
         "headline": "Principal Robotics & Embedded Systems Engineer",
         "summary": "Expert in hardware-software codesign, edge computing networks, real-time operating systems (RTOS), and multi-agent communication grids.",
         "country": "United States",
@@ -1325,7 +2303,11 @@ CANDIDATES_DATA = [
         "current_industry": "Technology",
         "certifications": "",
         "languages": "English;French",
-        "redrob_signals": {"github_activity_score": 97, "profile_completeness_score": 98, "last_active_date": "2026-06-25"}
+        "redrob_signals": {
+            "github_activity_score": 97,
+            "profile_completeness_score": 98,
+            "last_active_date": "2026-06-25",
+        },
     },
     {
         "candidate_id": "C048",
@@ -1342,9 +2324,22 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.82,
         "activity_score": 0.70,
         "career_history": [
-            {"title": "Junior Python Dev", "company": "Daily Bugle", "start_date": "2025-01", "end_date": "present", "description": "Maintaining image classification backend modules and news archival database search pages."}
+            {
+                "title": "Junior Python Dev",
+                "company": "Daily Bugle",
+                "start_date": "2025-01",
+                "end_date": "present",
+                "description": "Maintaining image classification backend modules and news archival database search pages.",
+            }
         ],
-        "education": [{"degree": "B.S.", "field": "Biophysics", "school": "Empire State University", "year": 2024}],
+        "education": [
+            {
+                "degree": "B.S.",
+                "field": "Biophysics",
+                "school": "Empire State University",
+                "year": 2024,
+            }
+        ],
         "headline": "Junior Python Developer | Django & Web Data Processing",
         "summary": "Recent graduate building secure backend applications, parsing XML logs, and managing simple relational database setups.",
         "country": "United States",
@@ -1352,7 +2347,11 @@ CANDIDATES_DATA = [
         "current_industry": "Publishing",
         "certifications": "",
         "languages": "English",
-        "redrob_signals": {"github_activity_score": 70, "profile_completeness_score": 82, "last_active_date": "2026-06-24"}
+        "redrob_signals": {
+            "github_activity_score": 70,
+            "profile_completeness_score": 82,
+            "last_active_date": "2026-06-24",
+        },
     },
     {
         "candidate_id": "C049",
@@ -1369,9 +2368,22 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.87,
         "activity_score": 0.76,
         "career_history": [
-            {"title": "Systems Specialist", "company": "Daily Planet", "start_date": "2022-06", "end_date": "present", "description": "Administering internal servers, custom database scripts, and automated script pipelines."}
+            {
+                "title": "Systems Specialist",
+                "company": "Daily Planet",
+                "start_date": "2022-06",
+                "end_date": "present",
+                "description": "Administering internal servers, custom database scripts, and automated script pipelines.",
+            }
         ],
-        "education": [{"degree": "B.A.", "field": "Journalism", "school": "University of Metropolis", "year": 2021}],
+        "education": [
+            {
+                "degree": "B.A.",
+                "field": "Journalism",
+                "school": "University of Metropolis",
+                "year": 2021,
+            }
+        ],
         "headline": "Systems Specialist | Python, SQL & Docker Server Admin",
         "summary": "Bridging software development and network administration. Experience in Dockerizing web frameworks and scheduling Cron tasks.",
         "country": "United States",
@@ -1379,7 +2391,11 @@ CANDIDATES_DATA = [
         "current_industry": "Publishing",
         "certifications": "",
         "languages": "English",
-        "redrob_signals": {"github_activity_score": 76, "profile_completeness_score": 87, "last_active_date": "2026-06-20"}
+        "redrob_signals": {
+            "github_activity_score": 76,
+            "profile_completeness_score": 87,
+            "last_active_date": "2026-06-20",
+        },
     },
     {
         "candidate_id": "C050",
@@ -1396,9 +2412,22 @@ CANDIDATES_DATA = [
         "profile_completeness": 0.95,
         "activity_score": 0.90,
         "career_history": [
-            {"title": "Lead Security Researcher", "company": "Smithsonian", "start_date": "2014-03", "end_date": "present", "description": "Directing secure archivals network setups and auditing digital authentication codes."}
+            {
+                "title": "Lead Security Researcher",
+                "company": "Smithsonian",
+                "start_date": "2014-03",
+                "end_date": "present",
+                "description": "Directing secure archivals network setups and auditing digital authentication codes.",
+            }
         ],
-        "education": [{"degree": "Ph.D.", "field": "History & Archaeology", "school": "Oxford University", "year": 2012}],
+        "education": [
+            {
+                "degree": "Ph.D.",
+                "field": "History & Archaeology",
+                "school": "Oxford University",
+                "year": 2012,
+            }
+        ],
         "headline": "Lead Security Researcher | Secure Archival & Digital Forensic Expert",
         "summary": "Over 12 years auditing secure document servers, reversing binary databases, and leading remote compliance groups.",
         "country": "United States",
@@ -1406,101 +2435,98 @@ CANDIDATES_DATA = [
         "current_industry": "Public Sector",
         "certifications": "GIAC Reverse Engineering Malware (GREM)",
         "languages": "English;Greek;French;German",
-        "redrob_signals": {"github_activity_score": 90, "profile_completeness_score": 95, "last_active_date": "2026-06-25"}
-    }
+        "redrob_signals": {
+            "github_activity_score": 90,
+            "profile_completeness_score": 95,
+            "last_active_date": "2026-06-25",
+        },
+    },
 ]
+
 
 def run_seeding():
     print("Loading demo dataset...")
-    
+
     # Define CSV file path
     data_dir = os.path.join(BASE_DIR, "data")
     os.makedirs(data_dir, exist_ok=True)
     csv_path = os.path.join(data_dir, "candidates.csv")
-    
-    # Clear SQLite database tables safely
-    db_path = os.path.join(data_dir, "recruiter.db")
-    if os.path.exists(db_path):
-        import sqlite3
-        try:
-            conn = sqlite3.connect(db_path)
-            cursor = conn.cursor()
-            cursor.execute("SELECT name FROM sqlite_master WHERE type='table'")
-            tables = [row[0] for row in cursor.fetchall()]
-            for table in ["candidates", "candidate_scores", "feedback", "jd_runs"]:
-                if table in tables:
-                    cursor.execute(f"DELETE FROM {table}")
-            conn.commit()
-            conn.close()
-            print("[Seed] Cleared old SQLite database tables.")
-        except Exception as e:
-            print(f"[Seed] Warning: Could not clear SQLite tables: {e}")
 
-    # Clear ChromaDB collection safely
-    try:
-        import chromadb
-        chroma_path = os.path.join(data_dir, "chroma_store")
-        if os.path.exists(chroma_path):
-            client = chromadb.PersistentClient(path=chroma_path)
-            collections = [c.name for c in client.list_collections()]
-            if "candidates" in collections:
-                col = client.get_collection("candidates")
-                existing = col.get()
-                if existing and "ids" in existing and existing["ids"]:
-                    col.delete(ids=existing["ids"])
-                    print(f"[Seed] Deleted {len(existing['ids'])} existing documents from ChromaDB collection.")
-                else:
-                    print("[Seed] ChromaDB collection is already empty.")
-    except Exception as e:
-        print(f"[Seed] Warning: Could not clear ChromaDB: {e}")
-        
+    # Demo data is only allowed in an empty installation. Never delete real data.
+    from database import init_db, count_candidates
+
+    init_db()
+    if count_candidates():
+        raise ValueError("Demo seeding requires an empty candidate database.")
+
     # Write candidates to CSV
     headers = [
-        "candidate_id", "name", "email", "phone", "location", "current_title", 
-        "current_company", "years_experience", "skills", "domain", "last_active", 
-        "profile_completeness", "activity_score", "career_history", "education",
-        "headline", "summary", "country", "current_company_size", "current_industry",
-        "certifications", "languages", "redrob_signals"
+        "candidate_id",
+        "name",
+        "email",
+        "phone",
+        "location",
+        "current_title",
+        "current_company",
+        "years_experience",
+        "skills",
+        "domain",
+        "last_active",
+        "profile_completeness",
+        "activity_score",
+        "career_history",
+        "education",
+        "headline",
+        "summary",
+        "country",
+        "current_company_size",
+        "current_industry",
+        "certifications",
+        "languages",
+        "redrob_signals",
     ]
-    
+
     with open(csv_path, mode="w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(headers)
         for c in CANDIDATES_DATA:
-            writer.writerow([
-                c["candidate_id"],
-                c["name"],
-                c["email"],
-                c["phone"],
-                c["location"],
-                c["current_title"],
-                c["current_company"],
-                c["years_experience"],
-                c["skills"],
-                c["domain"],
-                c["last_active"],
-                c["profile_completeness"],
-                c["activity_score"],
-                json.dumps(c["career_history"]),
-                json.dumps(c["education"]),
-                c["headline"],
-                c["summary"],
-                c["country"],
-                c["current_company_size"],
-                c["current_industry"],
-                c["certifications"],
-                c["languages"],
-                json.dumps(c["redrob_signals"])
-            ])
-            
+            writer.writerow(
+                [
+                    c["candidate_id"],
+                    c["name"],
+                    c["email"],
+                    c["phone"],
+                    c["location"],
+                    c["current_title"],
+                    c["current_company"],
+                    c["years_experience"],
+                    c["skills"],
+                    c["domain"],
+                    c["last_active"],
+                    c["profile_completeness"],
+                    c["activity_score"],
+                    json.dumps(c["career_history"]),
+                    json.dumps(c["education"]),
+                    c["headline"],
+                    c["summary"],
+                    c["country"],
+                    c["current_company_size"],
+                    c["current_industry"],
+                    c["certifications"],
+                    c["languages"],
+                    json.dumps(c["redrob_signals"]),
+                ]
+            )
+
     print("Generating embeddings...")
     print("Saving vectors...")
-    
+
     # Run the ingestion function
     ingest(csv_path)
-    
+
     print("Database seeded successfully.")
     print("50 candidates indexed.")
+
 
 if __name__ == "__main__":
     run_seeding()

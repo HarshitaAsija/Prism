@@ -5,7 +5,7 @@ Outputs a structured JSON dictionary matching the database schema.
 
 import json
 from typing import Dict, Any
-from llm_client import chat, system_user
+from llm_client import chat, system_user, AIUnavailable
 
 SYSTEM_PROMPT = """You are an expert AI recruiting assistant.
 Your task is to parse raw text from a candidate's resume and extract details into a structured JSON object.
@@ -50,16 +50,17 @@ CRITICAL RULES:
 3. If information is missing, use the default values specified.
 """
 
+
 def parse_resume_text(text: str) -> Dict[str, Any]:
     """
     Sends raw resume text to LLaMA-3.1-70B and parses the structured JSON output.
     """
     if not text or not text.strip():
-        return _empty_candidate()
+        raise ValueError("Resume cannot be empty.")
 
     messages = system_user(SYSTEM_PROMPT, f"Resume raw text:\n\n{text}")
     response = chat(messages, temperature=0.1, max_tokens=2000)
-    
+
     # Robust JSON extraction
     clean_response = response.strip()
     if clean_response.startswith("```"):
@@ -75,21 +76,29 @@ def parse_resume_text(text: str) -> Dict[str, Any]:
         data = json.loads(clean_response)
         return _validate_and_normalize(data)
     except Exception as e:
-        print(f"[ResumeParser] JSON decoding failed: {e}. Raw response snippet:\n{response[:200]}")
-        return _empty_candidate()
+        raise AIUnavailable("Resume analysis failed. Your profile has not been changed.") from e
+
 
 def _validate_and_normalize(data: Dict[str, Any]) -> Dict[str, Any]:
     """Ensure all required fields exist and are of correct types."""
+    if (
+        not isinstance(data, dict)
+        or not isinstance(data.get("name"), str)
+        or not data["name"].strip()
+        or not isinstance(data.get("skills"), list)
+        or not data["skills"]
+    ):
+        raise ValueError("Resume output is missing identity or skills.")
     default = _empty_candidate()
     normalized = {}
-    
+
     normalized["name"] = str(data.get("name") or default["name"])
     normalized["email"] = str(data.get("email") or default["email"])
     normalized["phone"] = str(data.get("phone") or default["phone"])
     normalized["location"] = str(data.get("location") or default["location"])
     normalized["current_title"] = str(data.get("current_title") or default["current_title"])
     normalized["current_company"] = str(data.get("current_company") or default["current_company"])
-    
+
     try:
         normalized["years_experience"] = float(data.get("years_experience", 0.0))
     except (ValueError, TypeError):
@@ -112,13 +121,15 @@ def _validate_and_normalize(data: Dict[str, Any]) -> Dict[str, Any]:
     if isinstance(history_raw, list):
         for job in history_raw:
             if isinstance(job, dict):
-                history.append({
-                    "title": str(job.get("title") or ""),
-                    "company": str(job.get("company") or ""),
-                    "start_date": str(job.get("start_date") or ""),
-                    "end_date": str(job.get("end_date") or ""),
-                    "description": str(job.get("description") or "")
-                })
+                history.append(
+                    {
+                        "title": str(job.get("title") or ""),
+                        "company": str(job.get("company") or ""),
+                        "start_date": str(job.get("start_date") or ""),
+                        "end_date": str(job.get("end_date") or ""),
+                        "description": str(job.get("description") or ""),
+                    }
+                )
     normalized["career_history"] = history
 
     # Education format
@@ -127,21 +138,28 @@ def _validate_and_normalize(data: Dict[str, Any]) -> Dict[str, Any]:
     if isinstance(edu_raw, list):
         for e in edu_raw:
             if isinstance(e, dict):
-                edu.append({
-                    "degree": str(e.get("degree") or ""),
-                    "field": str(e.get("field") or ""),
-                    "school": str(e.get("school") or "")
-                })
+                edu.append(
+                    {
+                        "degree": str(e.get("degree") or ""),
+                        "field": str(e.get("field") or ""),
+                        "school": str(e.get("school") or ""),
+                    }
+                )
     normalized["education"] = edu
 
     normalized["domain"] = str(data.get("domain") or default["domain"]).lower()
     normalized["headline"] = str(data.get("headline") or default["headline"])
     normalized["summary"] = str(data.get("summary") or default["summary"])
     normalized["country"] = str(data.get("country") or default["country"])
-    normalized["current_company_size"] = str(data.get("current_company_size") or default["current_company_size"])
-    normalized["current_industry"] = str(data.get("current_industry") or default["current_industry"])
+    normalized["current_company_size"] = str(
+        data.get("current_company_size") or default["current_company_size"]
+    )
+    normalized["current_industry"] = str(
+        data.get("current_industry") or default["current_industry"]
+    )
 
     return normalized
+
 
 def _empty_candidate() -> Dict[str, Any]:
     return {
@@ -160,5 +178,5 @@ def _empty_candidate() -> Dict[str, Any]:
         "summary": "",
         "country": "",
         "current_company_size": "",
-        "current_industry": ""
+        "current_industry": "",
     }

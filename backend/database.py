@@ -1,5 +1,5 @@
 """
-database.py — SQLite layer using SQLAlchemy core (no ORM overhead).
+database.py — SQLite persistence with additive migrations and workspace scoping.
 Single file. All DB logic lives here.
 """
 
@@ -10,9 +10,38 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from config import DB_PATH
+from contextvars import ContextVar
+
+# Set by the API dependency; propagated into worker threads. CLI tools have no scope.
+actor_context = ContextVar("actor", default=None)
+
+
+def candidate_scope(alias=""):
+    actor = actor_context.get()
+    prefix = alias + "." if alias else ""
+    if actor is None or actor["role"] == "admin":
+        return "1=1", []
+    if actor["role"] == "candidate":
+        return prefix + "owner_id=?", [actor["username"]]
+    return (
+        f"({prefix}owner_id=? OR {prefix}visibility='public' OR {prefix}id IN (SELECT a.candidate_id FROM applications a JOIN jobs j ON j.id=a.job_id WHERE j.owner_id=? AND a.stage!='withdrawn'))",
+        [
+            actor.get("workspace_id", actor["username"]),
+            actor.get("workspace_id", actor["username"]),
+        ],
+    )
+
+
+def run_scope():
+    actor = actor_context.get()
+    if actor is None or actor["role"] == "admin":
+        return "1=1", []
+    return "owner_id=?", [actor.get("workspace_id", actor["username"])]
+
+
 import os
 
-os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+os.makedirs(os.path.dirname(os.path.abspath(DB_PATH)), exist_ok=True)
 
 
 # ── Schema DDL ────────────────────────────────────────────────────────────────
@@ -102,8 +131,8 @@ CREATE INDEX IF NOT EXISTS idx_feedback_run ON feedback(run_id);
 def get_conn():
     """Context manager — always closes connection cleanly."""
     conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-    conn.row_factory = sqlite3.Row        # rows behave like dicts
-    conn.execute("PRAGMA journal_mode=WAL")   # safe concurrent reads
+    conn.row_factory = sqlite3.Row  # rows behave like dicts
+    conn.execute("PRAGMA journal_mode=WAL")  # safe concurrent reads
     try:
         yield conn
         conn.commit()
@@ -118,10 +147,47 @@ def init_db():
     """Create all tables on first run."""
     with get_conn() as conn:
         conn.executescript(SCHEMA)
+        from hiring import SCHEMA as HIRING_SCHEMA
+
+        conn.executescript(HIRING_SCHEMA)
+        # Additive, idempotent migrations preserve existing installations.
+        migrations = {
+            "auth_users": {
+                "name": "TEXT NOT NULL DEFAULT ''",
+                "candidate_id": "TEXT",
+                "workspace_id": "TEXT",
+            },
+            "candidates": {
+                "owner_id": "TEXT",
+                "visibility": "TEXT NOT NULL DEFAULT 'private'",
+                "github": "TEXT DEFAULT ''",
+                "linkedin": "TEXT DEFAULT ''",
+                "index_status": "TEXT DEFAULT 'pending'",
+            },
+            "candidate_scores": {"profile_snapshot": "TEXT"},
+            "jd_runs": {
+                "pipeline_metadata": "TEXT",
+                "owner_id": "TEXT",
+                "status": "TEXT DEFAULT 'complete'",
+                "error": "TEXT",
+            },
+        }
+        for table, columns in migrations.items():
+            existing = {r[1] for r in conn.execute(f"PRAGMA table_info({table})")}
+            for column, ddl in columns.items():
+                if column not in existing:
+                    conn.execute(f"ALTER TABLE {table} ADD COLUMN {column} {ddl}")
+        conn.executescript("""
+            CREATE TABLE IF NOT EXISTS auth_sessions(token_hash TEXT PRIMARY KEY, username TEXT NOT NULL, expires_at REAL NOT NULL);
+            CREATE TABLE IF NOT EXISTS request_limits(key TEXT, bucket INTEGER, count INTEGER, PRIMARY KEY(key,bucket));
+            CREATE INDEX IF NOT EXISTS idx_candidates_owner ON candidates(owner_id);
+            CREATE INDEX IF NOT EXISTS idx_runs_owner ON jd_runs(owner_id);
+        """)
     print(f"[DB] Initialised at {DB_PATH}")
 
 
 # ── Candidate operations ───────────────────────────────────────────────────────
+
 
 def upsert_candidate(candidate: Dict[str, Any]):
     """Insert or replace a candidate record."""
@@ -145,6 +211,9 @@ def upsert_candidate(candidate: Dict[str, Any]):
         )
         ON CONFLICT(id) DO UPDATE SET
             name=excluded.name,
+            email=excluded.email,
+            phone=excluded.phone,
+            domain=excluded.domain,
             current_title=excluded.current_title,
             current_company=excluded.current_company,
             skills=excluded.skills,
@@ -197,9 +266,9 @@ def upsert_candidate(candidate: Dict[str, Any]):
         "intent_score": candidate.get("intent_score", 0.0),
         "hidden_gem_score": candidate.get("hidden_gem_score", 0.0),
         "max_promotion_velocity": candidate.get("max_promotion_velocity", 0.0),
-        "avg_time_in_role_months": candidate.get("avg_time_in_role_months", 0.0)
+        "avg_time_in_role_months": candidate.get("avg_time_in_role_months", 0.0),
     }
-    
+
     # Serialise lists and dicts
     for k, v in row.items():
         if isinstance(v, (list, dict)):
@@ -207,12 +276,27 @@ def upsert_candidate(candidate: Dict[str, Any]):
 
     with get_conn() as conn:
         conn.execute(sql, row)
+        actor = actor_context.get()
+        owner = candidate.get("owner_id") or (
+            (actor.get("workspace_id") or actor["username"]) if actor else None
+        )
+        conn.execute(
+            "UPDATE candidates SET owner_id=COALESCE(owner_id,?), visibility=?, github=?, linkedin=? WHERE id=?",
+            (
+                owner,
+                candidate.get("visibility", "private"),
+                candidate.get("github", ""),
+                candidate.get("linkedin", ""),
+                candidate["id"],
+            ),
+        )
 
 
 def get_candidate(candidate_id: str) -> Optional[Dict]:
+    where, params = candidate_scope()
     with get_conn() as conn:
         row = conn.execute(
-            "SELECT * FROM candidates WHERE id = ?", (candidate_id,)
+            "SELECT * FROM candidates WHERE id = ? AND " + where, [candidate_id, *params]
         ).fetchone()
     if not row:
         return None
@@ -220,6 +304,7 @@ def get_candidate(candidate_id: str) -> Optional[Dict]:
 
 
 import math
+
 
 def _clean_floats(obj):
     if isinstance(obj, float):
@@ -232,47 +317,62 @@ def _clean_floats(obj):
         return [_clean_floats(v) for v in obj]
     return obj
 
-def get_all_candidates(limit: int = 5000) -> List[Dict]:
+
+def get_all_candidates(limit: int = 5000, offset: int = 0) -> List[Dict]:
+    where, params = candidate_scope()
     with get_conn() as conn:
         rows = conn.execute(
-            "SELECT * FROM candidates LIMIT ?", (limit,)
+            "SELECT * FROM candidates WHERE " + where + " ORDER BY id LIMIT ? OFFSET ?",
+            [*params, limit, offset],
         ).fetchall()
     return [_clean_floats(_deserialise(dict(r))) for r in rows]
 
 
 def count_candidates() -> int:
+    where, params = candidate_scope()
     with get_conn() as conn:
-        return conn.execute("SELECT COUNT(*) FROM candidates").fetchone()[0]
+        return conn.execute("SELECT COUNT(*) FROM candidates WHERE " + where, params).fetchone()[0]
 
 
 # ── JD run operations ──────────────────────────────────────────────────────────
 
+
 def save_jd_run(run_id: str, jd_text: str, jd_parsed: Dict, weights: Dict):
     sql = """
-        INSERT OR REPLACE INTO jd_runs (run_id, jd_text, jd_parsed, weights)
-        VALUES (?, ?, ?, ?)
+        INSERT INTO jd_runs (run_id, jd_text, jd_parsed, weights, owner_id)
+        VALUES (?, ?, ?, ?, ?)
     """
     with get_conn() as conn:
-        conn.execute(sql, (
-            run_id, jd_text,
-            json.dumps(jd_parsed), json.dumps(weights)
-        ))
+        conn.execute(
+            sql,
+            (
+                run_id,
+                jd_text,
+                json.dumps(jd_parsed),
+                json.dumps(weights),
+                (actor_context.get() or {}).get("workspace_id")
+                or (actor_context.get() or {}).get("username"),
+            ),
+        )
 
 
 def get_jd_run(run_id: str) -> Optional[Dict]:
+    where, params = run_scope()
     with get_conn() as conn:
         row = conn.execute(
-            "SELECT * FROM jd_runs WHERE run_id = ?", (run_id,)
+            "SELECT * FROM jd_runs WHERE run_id = ? AND " + where, [run_id, *params]
         ).fetchone()
     if not row:
         return None
     d = dict(row)
     d["jd_parsed"] = json.loads(d["jd_parsed"] or "{}")
-    d["weights"]   = json.loads(d["weights"] or "{}")
+    d["weights"] = json.loads(d["weights"] or "{}")
+    d["pipeline_metadata"] = _safe_json(d.get("pipeline_metadata") or "{}")
     return d
 
 
 # ── Score operations ───────────────────────────────────────────────────────────
+
 
 def save_score(run_id: str, candidate_id: str, scores: Dict[str, Any]):
     sql = """
@@ -300,7 +400,7 @@ def save_score(run_id: str, candidate_id: str, scores: Dict[str, Any]):
             skill_gap=excluded.skill_gap
     """
     row = dict(scores)
-    row["run_id"]       = run_id
+    row["run_id"] = run_id
     row["candidate_id"] = candidate_id
     if isinstance(row.get("skill_gap"), (list, dict)):
         row["skill_gap"] = json.dumps(row["skill_gap"])
@@ -309,6 +409,8 @@ def save_score(run_id: str, candidate_id: str, scores: Dict[str, Any]):
 
 
 def get_ranked_results(run_id: str) -> List[Dict]:
+    if not get_jd_run(run_id):
+        return []
     sql = """
         SELECT cs.*, c.name, c.current_title, c.current_company,
                c.years_experience, c.skills, c.domain, c.location
@@ -322,22 +424,57 @@ def get_ranked_results(run_id: str) -> List[Dict]:
     results = []
     for r in rows:
         d = dict(r)
-        d["skills"]    = _safe_json(d.get("skills"))
+        d["skills"] = _safe_json(d.get("skills"))
         d["skill_gap"] = _safe_json(d.get("skill_gap"))
+        snapshot = _safe_json(d.pop("profile_snapshot", None))
+        if isinstance(snapshot, dict):
+            for field in (
+                "name",
+                "current_title",
+                "current_company",
+                "years_experience",
+                "skills",
+                "domain",
+                "location",
+            ):
+                if field in snapshot:
+                    d[field] = snapshot[field]
+        d["rank"] = d["rank_position"]
+        d["score_breakdown"] = {
+            k: d[k + "_score"] for k in ("semantic", "skill", "trajectory", "behavioral", "domain")
+        }
+        d["explanation"] = d.get("explanation") or "Explanation unavailable."
+        d["outreach_msg"] = d.get("outreach_msg") or ""
         results.append(d)
     return results
 
 
 # ── Feedback operations ────────────────────────────────────────────────────────
 
-def save_feedback(run_id: str, candidate_id: str,
-                  feedback_type: str, notes: str = ""):
-    sql = """
-        INSERT INTO feedback (run_id, candidate_id, feedback_type, notes)
-        VALUES (?, ?, ?, ?)
-    """
+
+def save_feedback(run_id: str, candidate_id: str, feedback_type: str, notes: str = ""):
+    if not get_jd_run(run_id) or not any(
+        r["candidate_id"] == candidate_id for r in get_ranked_results(run_id)
+    ):
+        raise ValueError("Candidate is not part of this run.")
     with get_conn() as conn:
-        conn.execute(sql, (run_id, candidate_id, feedback_type, notes))
+        conn.execute(
+            "DELETE FROM feedback WHERE run_id=? AND candidate_id=?", (run_id, candidate_id)
+        )
+        conn.execute(
+            "INSERT INTO feedback(run_id,candidate_id,feedback_type,notes) VALUES(?,?,?,?)",
+            (run_id, candidate_id, feedback_type, notes),
+        )
+
+
+def get_feedback_map(run_id):
+    if not get_jd_run(run_id):
+        return {}
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT candidate_id,feedback_type FROM feedback WHERE run_id=? ORDER BY id", (run_id,)
+        ).fetchall()
+    return {r[0]: r[1] for r in rows}
 
 
 def get_rejected_candidates(run_id: str) -> List[str]:
@@ -345,12 +482,13 @@ def get_rejected_candidates(run_id: str) -> List[str]:
     with get_conn() as conn:
         rows = conn.execute(
             "SELECT candidate_id FROM feedback WHERE run_id=? AND feedback_type='not_a_fit'",
-            (run_id,)
+            (run_id,),
         ).fetchall()
     return [r[0] for r in rows]
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
+
 
 def _safe_json(val):
     if val is None:
@@ -365,13 +503,22 @@ def _safe_json(val):
 
 def _deserialise(row: Dict) -> Dict:
     """Parse JSON string fields back into Python objects."""
-    for field in ("skills", "career_history", "education", "raw_data", "certifications", "languages", "redrob_signals"):
+    for field in (
+        "skills",
+        "career_history",
+        "education",
+        "raw_data",
+        "certifications",
+        "languages",
+        "redrob_signals",
+    ):
         if isinstance(row.get(field), str):
             row[field] = _safe_json(row[field])
     return row
 
 
 # ── Auth operations ───────────────────────────────────────────────────────────
+
 
 def save_user(username: str, password_hash: str, role: str):
     sql = """
@@ -387,9 +534,7 @@ def save_user(username: str, password_hash: str, role: str):
 
 def get_user(username: str) -> Optional[Dict]:
     with get_conn() as conn:
-        row = conn.execute(
-            "SELECT * FROM auth_users WHERE username = ?", (username,)
-        ).fetchone()
+        row = conn.execute("SELECT * FROM auth_users WHERE username = ?", (username,)).fetchone()
     if not row:
         return None
     return dict(row)
@@ -397,103 +542,71 @@ def get_user(username: str) -> Optional[Dict]:
 
 # ── Analytics & run-listing operations ────────────────────────────────────────
 
+
 def list_jd_runs(limit: int = 50) -> List[Dict]:
-    """Return the most recent JD runs (descending by creation time)."""
+    where, params = run_scope()
     with get_conn() as conn:
         rows = conn.execute(
-            "SELECT run_id, jd_text, jd_parsed, weights, created_at FROM jd_runs ORDER BY created_at DESC LIMIT ?",
-            (limit,)
+            "SELECT * FROM jd_runs WHERE " + where + " ORDER BY created_at DESC LIMIT ?",
+            [*params, limit],
         ).fetchall()
     results = []
-    for r in rows:
-        d = dict(r)
+    for row in rows:
+        d = dict(row)
         d["jd_parsed"] = _safe_json(d.get("jd_parsed") or "{}")
-        d["weights"]   = _safe_json(d.get("weights") or "{}")
-        # Truncate jd_text for listing
-        d["jd_preview"] = (d["jd_text"] or "")[:200]
+        d["weights"] = _safe_json(d.get("weights") or "{}")
+        d["jd_preview"] = d["jd_text"][:200]
         results.append(d)
     return results
 
 
 def clear_all_runs():
-    """Delete all records from jd_runs and candidate_scores."""
+    where, params = run_scope()
     with get_conn() as conn:
-        conn.execute("DELETE FROM jd_runs")
-        conn.execute("DELETE FROM candidate_scores")
+        for table in ("feedback", "candidate_scores"):
+            conn.execute(
+                f"DELETE FROM {table} WHERE run_id IN (SELECT run_id FROM jd_runs WHERE {where})",
+                params,
+            )
+        conn.execute("DELETE FROM jd_runs WHERE " + where, params)
 
 
 def get_analytics() -> Dict:
-    """Aggregate pool-level analytics for the dashboard."""
-    with get_conn() as conn:
-        total = conn.execute("SELECT COUNT(*) FROM candidates").fetchone()[0]
-
-        # Domain distribution
-        domain_rows = conn.execute(
-            "SELECT domain, COUNT(*) as cnt FROM candidates WHERE domain != '' GROUP BY domain ORDER BY cnt DESC LIMIT 15"
-        ).fetchall()
-
-        # Avg experience
-        avg_exp = conn.execute(
-            "SELECT AVG(years_experience) FROM candidates WHERE years_experience > 0"
-        ).fetchone()[0] or 0
-
-        # Top skills (aggregate across all candidates)
-        skill_rows = conn.execute(
-            "SELECT skills FROM candidates WHERE skills IS NOT NULL AND skills != '[]'"
-        ).fetchall()
-
-        # Score stats from most recent run
-        score_row = conn.execute("""
-            SELECT
-                AVG(composite_score) as avg_score,
-                MAX(composite_score) as max_score,
-                MIN(composite_score) as min_score,
-                COUNT(DISTINCT run_id) as total_runs
-            FROM candidate_scores
-        """).fetchone()
-
-        # Recent runs summary
-        run_rows = conn.execute("""
-            SELECT run_id, created_at,
-                   COUNT(*) as candidates_evaluated,
-                   MAX(composite_score) as top_score
-            FROM candidate_scores
-            GROUP BY run_id
-            ORDER BY created_at DESC
-            LIMIT 10
-        """).fetchall()
-
-    # Process top skills
     from collections import Counter
-    skill_counter: Counter = Counter()
-    for row in skill_rows:
-        skills = _safe_json(row[0])
-        if isinstance(skills, list):
-            for s in skills:
-                if isinstance(s, str) and s.strip():
-                    skill_counter[s.strip()] += 1
 
-    top_skills = [{"skill": s, "count": c} for s, c in skill_counter.most_common(20)]
-
+    candidates = get_all_candidates(limit=100000)
+    domains = Counter(c.get("domain") or "Unknown" for c in candidates)
+    skills = Counter(s for c in candidates for s in (c.get("skills") or []) if isinstance(s, str))
+    experience = [c["years_experience"] for c in candidates if (c.get("years_experience") or 0) > 0]
+    where, params = run_scope()
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT cs.run_id, MAX(cs.created_at) created_at, COUNT(*) candidates_evaluated, "
+            "MAX(composite_score) top_score FROM candidate_scores cs JOIN jd_runs r ON r.run_id=cs.run_id "
+            "WHERE " + where + " GROUP BY cs.run_id ORDER BY created_at DESC LIMIT 10",
+            params,
+        ).fetchall()
+        scores = [
+            r[0]
+            for r in conn.execute(
+                "SELECT composite_score FROM candidate_scores WHERE run_id IN "
+                "(SELECT run_id FROM jd_runs WHERE " + where + ")",
+                params,
+            )
+        ]
+        total_runs = conn.execute("SELECT COUNT(*) FROM jd_runs WHERE " + where, params).fetchone()[
+            0
+        ]
     return {
-        "total_candidates": total,
-        "avg_experience_years": round(avg_exp, 1),
-        "domain_distribution": [{"domain": r[0] or "Unknown", "count": r[1]} for r in domain_rows],
-        "top_skills": top_skills,
+        "total_candidates": len(candidates),
+        "avg_experience_years": round(sum(experience) / len(experience), 1) if experience else 0,
+        "domain_distribution": [{"domain": k, "count": v} for k, v in domains.most_common(15)],
+        "top_skills": [{"skill": k, "count": v} for k, v in skills.most_common(20)],
         "score_stats": {
-            "avg":        round(float(score_row[0] or 0) * 100, 1),
-            "max":        round(float(score_row[1] or 0) * 100, 1),
-            "min":        round(float(score_row[2] or 0) * 100, 1),
-            "total_runs": int(score_row[3] or 0),
+            "avg": round(sum(scores) / len(scores), 1) if scores else 0,
+            "max": max(scores, default=0),
+            "min": min(scores, default=0),
+            "total_runs": total_runs,
         },
-        "recent_runs": [
-            {
-                "run_id":               r[0],
-                "created_at":           r[1],
-                "candidates_evaluated": r[2],
-                "top_score":            round(float(r[3] or 0) * 100, 1),
-            }
-            for r in run_rows
-        ],
+        "recent_runs": [dict(r) for r in rows],
     }
-

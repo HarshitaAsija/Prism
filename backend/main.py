@@ -1,532 +1,457 @@
-"""
-main.py — FastAPI application entry point.
-All API routes live here. Business logic lives in ranker.py and other modules.
-
-Run with:
-    uvicorn main:app --reload --port 8000
-"""
+"""Authenticated Prism API. Run: uvicorn main:app --reload --port 8000."""
 
 import csv
 import io
+import os
+import tempfile
 import uuid
-from typing import Dict, List, Optional
-
-from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File
+from typing import Optional
+from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, JSONResponse
 from pydantic import BaseModel, Field
-
+from starlette.concurrency import run_in_threadpool
+import database as db
+from auth import router as auth_router, current_user, recruiter, admin, limit_requests
 from config import CORS_ORIGINS, DEFAULT_WEIGHTS
-from database import (
-    init_db, count_candidates,
-    get_candidate, get_all_candidates,
-    get_ranked_results, save_feedback, get_jd_run,
-    list_jd_runs, get_analytics,
-)
-from vector_store import count as vcount
-from ranker import rank_candidates
+from models import RankRequest, FeedbackRequest
 
-# ── App setup ──────────────────────────────────────────────────────────────────
-app = FastAPI(
-    title="AI Recruiter API",
-    description="Intelligent candidate ranking engine powered by NVIDIA NIM + semantic search.",
-    version="1.0.0",
-)
+from contextlib import asynccontextmanager
 
+
+@asynccontextmanager
+async def lifespan(app):
+    startup()
+    yield
+
+
+app = FastAPI(title="Prism Hiring API", version="2.0.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH"],
+    allow_headers=["Content-Type", "X-Prism-Client"],
 )
+app.include_router(auth_router)
+from hiring import router as hiring_router
 
-# ── Init DB on startup ─────────────────────────────────────────────────────────
-@app.on_event("startup")
-def on_startup():
-    init_db()
-    print("[API] Database initialised.")
-    try:
-        cand_count = count_candidates()
-        vector_count = vcount()
-        print(f"[API] Initial count check: {cand_count} candidates in DB, {vector_count} vectors in store.")
-        if cand_count == 0 or vector_count == 0:
-            print("[API] Database or vector store is empty. Seeding demo data...")
-            from seed import run_seeding
-            run_seeding()
-            print(f"[API] Seeding complete. Candidates: {count_candidates()}, Vectors: {vcount()}")
-    except Exception as e:
-        print(f"[API] Error checking/seeding database: {e}")
+app.include_router(hiring_router)
 
 
-@app.post("/admin/seed")
-def manual_seed():
-    """
-    Manually trigger data seeding — use this after deployment if
-    /health shows 0 candidates (startup seeding can silently fail on cold boot).
-    """
-    try:
-        from seed import run_seeding
-        run_seeding()
-        return {
-            "status": "ok",
-            "candidates": count_candidates(),
-            "vectors": vcount(),
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def startup():
+    # Never seed or download models during startup.
+    db.init_db()
 
 
-# ── Pydantic request/response models ──────────────────────────────────────────
-
-class WeightsModel(BaseModel):
-    semantic:   float = Field(default=0.30, ge=0, le=1)
-    skill:      float = Field(default=0.25, ge=0, le=1)
-    trajectory: float = Field(default=0.20, ge=0, le=1)
-    behavioral: float = Field(default=0.15, ge=0, le=1)
-    domain:     float = Field(default=0.10, ge=0, le=1)
+@app.exception_handler(ValueError)
+async def invalid_input(request, error):
+    return JSONResponse(status_code=422, content={"detail": str(error)})
 
 
-class RankRequest(BaseModel):
-    jd_text:         str  = Field(..., min_length=50, description="Full job description text")
-    weights:         Optional[WeightsModel] = None
-    run_id:          Optional[str] = None
-    previous_run_id: Optional[str] = None
+from llm_client import AIUnavailable
 
 
-class FeedbackRequest(BaseModel):
-    run_id:        str
-    candidate_id:  str
-    feedback_type: str = Field(..., pattern="^(not_a_fit|strong_yes|maybe)$")
-    notes:         Optional[str] = ""
+@app.exception_handler(AIUnavailable)
+async def ai_unavailable(request, error):
+    return JSONResponse(status_code=503, content={"detail": str(error), "status": "unavailable"})
 
-
-class CandidateUpdate(BaseModel):
-    name: Optional[str] = None
-    title: Optional[str] = None
-    experienceYears: Optional[float] = None
-    skills: Optional[List[str]] = None
-    github: Optional[str] = None
-    linkedin: Optional[str] = None
-    certifications: Optional[List[str]] = None
-
-
-# ── Routes ─────────────────────────────────────────────────────────────────────
 
 @app.get("/health")
-def health_check():
-    """Server status — frontend polls this on startup."""
-    try:
-        candidate_count = count_candidates()
-        vector_count    = vcount()
-        return {
-            "status":          "ok",
-            "candidates_in_db":     candidate_count,
-            "vectors_in_store":     vector_count,
-            "model":           "NVIDIA NIM / LLaMA-3.1-70B",
-            "embedding_model": "all-MiniLM-L6-v2",
-        }
-    except Exception as e:
-        return {"status": "error", "detail": str(e)}
+def health():
+    return {"status": "ok", "model": "NVIDIA NIM", "embedding_model": "all-MiniLM-L6-v2"}
 
 
-@app.post("/rank")
-async def rank(request: RankRequest):
-    """
-    Main endpoint — receives a JD and returns a ranked candidate shortlist.
-
-    Body:
-        jd_text:    full job description (required)
-        weights:    optional custom scoring weights
-        run_id:     optional, auto-generated if not provided
-        previous_run_id: optional, to exclude 'not_a_fit' candidates from a prior run
-    """
-    if not request.jd_text.strip():
-        raise HTTPException(status_code=400, detail="jd_text cannot be empty.")
-
-    weights_dict = (
-        request.weights.model_dump() if request.weights
-        else DEFAULT_WEIGHTS
-    )
-
-    try:
-        result = await rank_candidates(
-            jd_text         = request.jd_text,
-            weights         = weights_dict,
-            run_id          = request.run_id or str(uuid.uuid4()),
-            previous_run_id = request.previous_run_id,
-        )
-        return result
-    except Exception as e:
-        print(f"[API] /rank error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/candidates")
-def list_candidates(limit: int = 100, offset: int = 0):
-    """Return all candidates (paginated). Used by frontend to show full pool."""
-    try:
-        all_cands = get_all_candidates(limit=limit + offset)
-        page      = all_cands[offset: offset + limit]
-        return {
-            "total":      count_candidates(),
-            "offset":     offset,
-            "limit":      limit,
-            "candidates": page,
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/candidates/{candidate_id}")
-def get_one_candidate(candidate_id: str):
-    """Full profile for a single candidate. Used when recruiter expands a card."""
-    cand = get_candidate(candidate_id)
-    if not cand:
-        raise HTTPException(status_code=404, detail="Candidate not found.")
-    return cand
-
-
-@app.put("/candidates/{candidate_id}")
-def update_one_candidate(candidate_id: str, update_data: CandidateUpdate):
-    """Update profile details from Candidate Dashboard and re-ingest to Chroma."""
-    try:
-        from database import upsert_candidate
-        from data_ingest import ingest_single_candidate
-        
-        cand = get_candidate(candidate_id)
-        if not cand:
-            raise HTTPException(status_code=404, detail="Candidate not found.")
-        
-        # Update fields
-        if update_data.name is not None:
-            cand["name"] = update_data.name
-        if update_data.title is not None:
-            cand["current_title"] = update_data.title
-        if update_data.experienceYears is not None:
-            cand["years_experience"] = update_data.experienceYears
-        if update_data.skills is not None:
-            cand["skills"] = update_data.skills
-        if update_data.certifications is not None:
-            cand["certifications"] = update_data.certifications
-            
-        # Optional: could store github/linkedin in raw_data or add to DB schema if needed
-        # but for now we just want to re-ingest for semantic search
-        upsert_candidate(cand)
-        
-        # Update vector store
-        ingest_single_candidate(cand)
-        
-        return {"status": "success", "candidate": cand}
-    except Exception as e:
-        print(f"[API] Candidate update error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/runs/{run_id}")
-def get_run(run_id: str):
-    """Return metadata for a ranking run (JD, weights, parsed JD)."""
-    run = get_jd_run(run_id)
+def own_run(run_id):
+    run = db.get_jd_run(run_id)
     if not run:
-        raise HTTPException(status_code=404, detail="Run not found.")
+        raise HTTPException(404, "Run not found.")
     return run
 
 
+def candidate_or_404(candidate_id, user, edit=False):
+    candidate = db.get_candidate(candidate_id)
+    if not candidate:
+        raise HTTPException(404, "Candidate not found.")
+    if (
+        edit
+        and user["role"] != "admin"
+        and candidate.get("owner_id")
+        != (user["username"] if user["role"] == "candidate" else user["workspace_id"])
+    ):
+        raise HTTPException(403, "You can only edit profiles you own.")
+    return candidate
+
+
+class CandidateUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=1, max_length=120)
+    title: Optional[str] = Field(None, max_length=200)
+    experienceYears: Optional[float] = Field(None, ge=0, le=80)
+    skills: Optional[list[str]] = Field(None, max_length=100)
+    github: Optional[str] = Field(None, max_length=500)
+    linkedin: Optional[str] = Field(None, max_length=500)
+    certifications: Optional[list[str]] = Field(None, max_length=50)
+    visibility: Optional[str] = Field(None, pattern="^(private|public)$")
+
+
+@app.get("/me/profile")
+def my_profile(user=Depends(current_user)):
+    if user["role"] != "candidate":
+        raise HTTPException(403, "Candidate account required.")
+    return candidate_or_404(user["candidate_id"], user)
+
+
+# Static routes precede the dynamic candidate ID route.
+@app.get("/candidates/search")
+def search_candidates(
+    q: str = Query(min_length=2, max_length=1000),
+    limit: int = Query(50, ge=1, le=100),
+    user=Depends(recruiter),
+):
+    from embedder import embed_text
+    from vector_store import search
+
+    ids = [c["id"] for c in db.get_all_candidates(limit=100000)]
+    return [
+        dict(db.get_candidate(r["candidate_id"]), similarity_score=r["similarity"])
+        for r in search(embed_text(q), top_n=limit, candidate_ids=ids)
+    ]
+
+
+@app.get("/candidates")
+def candidates(
+    limit: int = Query(100, ge=1, le=500), offset: int = Query(0, ge=0), user=Depends(recruiter)
+):
+    return {
+        "total": db.count_candidates(),
+        "limit": limit,
+        "offset": offset,
+        "candidates": db.get_all_candidates(limit, offset),
+    }
+
+
+@app.get("/candidates/{candidate_id}")
+def candidate(candidate_id: str, user=Depends(current_user)):
+    return candidate_or_404(candidate_id, user)
+
+
+@app.put("/candidates/{candidate_id}")
+def update_candidate(candidate_id: str, body: CandidateUpdate, user=Depends(current_user)):
+    from utils import estimate_completeness
+
+    candidate = candidate_or_404(candidate_id, user, edit=True)
+    fields = body.model_dump(exclude_none=True)
+    for field in ("github", "linkedin"):
+        if fields.get(field) and not fields[field].startswith("https://"):
+            raise HTTPException(422, "Profile links must use HTTPS.")
+    fields = {
+        {"title": "current_title", "experienceYears": "years_experience"}.get(k, k): v
+        for k, v in fields.items()
+    }
+    candidate.update(fields)
+    candidate["profile_completeness"] = estimate_completeness(candidate)
+    db.upsert_candidate(candidate)
+    with db.get_conn() as conn:
+        conn.execute("UPDATE candidates SET index_status='pending' WHERE id=?", (candidate_id,))
+    return {"status": "success", "candidate": candidate}
+
+
+@app.post("/rank")
+async def rank(body: RankRequest, user=Depends(recruiter)):
+    from ranker import rank_candidates
+
+    if body.previous_run_id:
+        own_run(body.previous_run_id)
+    limit_requests("rank:" + user["username"], 10)
+    return await rank_candidates(
+        body.jd_text,
+        body.weights.model_dump() if body.weights else DEFAULT_WEIGHTS,
+        str(uuid.uuid4()),
+        body.previous_run_id,
+        top_n=body.top_n,
+    )
+
+
+@app.get("/runs")
+def runs(limit: int = Query(50, ge=1, le=200), user=Depends(recruiter)):
+    rows = db.list_jd_runs(limit)
+    return {"total": len(rows), "runs": rows}
+
+
+@app.get("/runs/{run_id}")
+def run(run_id: str, user=Depends(recruiter)):
+    return own_run(run_id)
+
+
 @app.get("/runs/{run_id}/results")
-def get_results(run_id: str):
-    """Return the ranked results for a completed run (from DB cache)."""
-    results = get_ranked_results(run_id)
-    if not results:
-        raise HTTPException(status_code=404, detail="No results found for this run_id.")
-    return {"run_id": run_id, "results": results}
+def results(run_id: str, user=Depends(recruiter)):
+    own_run(run_id)
+    return {"run_id": run_id, "results": db.get_ranked_results(run_id)}
+
+
+@app.delete("/runs")
+def clear_runs(user=Depends(recruiter)):
+    db.clear_all_runs()
+    return {"status": "success"}
 
 
 @app.post("/feedback")
-def submit_feedback(request: FeedbackRequest):
-    """
-    Recruiter marks a candidate as 'not_a_fit', 'strong_yes', or 'maybe'.
-    Pass the run_id as previous_run_id in a subsequent /rank call to apply.
-    """
-    try:
-        save_feedback(
-            run_id       = request.run_id,
-            candidate_id = request.candidate_id,
-            feedback_type= request.feedback_type,
-            notes        = request.notes or "",
-        )
-        return {"status": "saved", "feedback_type": request.feedback_type}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def feedback(body: FeedbackRequest, user=Depends(recruiter)):
+    own_run(body.run_id)
+    db.save_feedback(body.run_id, body.candidate_id, body.feedback_type, body.notes or "")
+    return {"status": "saved", "feedback_type": body.feedback_type}
+
+
+@app.post("/runs/{run_id}/rerank")
+async def rerank(run_id: str, user=Depends(recruiter)):
+    from feedback_reranker import apply_feedback_boost
+
+    own_run(run_id)
+    adjusted = await run_in_threadpool(
+        apply_feedback_boost, db.get_ranked_results(run_id), run_id, db.get_feedback_map(run_id)
+    )
+    return {"run_id": run_id, "results": adjusted, "preview": True}
 
 
 @app.get("/export/{run_id}")
-def export_csv(run_id: str):
-    """
-    Download ranked results as CSV in submission format.
-    Columns: rank, candidate_id, name, composite_score, explanation,
-             semantic, skill, trajectory, behavioral, domain
-    """
-    results = get_ranked_results(run_id)
-    if not results:
-        raise HTTPException(status_code=404, detail="No results for this run_id.")
-
-    output = io.StringIO()
-    writer = csv.DictWriter(output, fieldnames=[
-        "rank", "candidate_id", "name", "current_title", "current_company",
-        "composite_score", "semantic_score", "skill_score",
-        "trajectory_score", "behavioral_score", "domain_score",
+def export(run_id: str, user=Depends(recruiter)):
+    own_run(run_id)
+    fields = [
+        "rank",
+        "candidate_id",
+        "name",
+        "current_title",
+        "current_company",
+        "composite_score",
+        "semantic_score",
+        "skill_score",
+        "trajectory_score",
+        "behavioral_score",
+        "domain_score",
         "explanation",
-    ])
+    ]
+    output = io.StringIO()
+    writer = csv.DictWriter(output, fieldnames=fields)
     writer.writeheader()
-    for r in results:
-        writer.writerow({
-            "rank":             r.get("rank_position", ""),
-            "candidate_id":     r.get("candidate_id", ""),
-            "name":             r.get("name", ""),
-            "current_title":    r.get("current_title", ""),
-            "current_company":  r.get("current_company", ""),
-            "composite_score":  r.get("composite_score", ""),
-            "semantic_score":   r.get("semantic_score", ""),
-            "skill_score":      r.get("skill_score", ""),
-            "trajectory_score": r.get("trajectory_score", ""),
-            "behavioral_score": r.get("behavioral_score", ""),
-            "domain_score":     r.get("domain_score", ""),
-            "explanation":      r.get("explanation", ""),
-        })
-
-    output.seek(0)
+    for row in db.get_ranked_results(run_id):
+        writer.writerow(
+            {
+                k: (
+                    "'" + str(row[k])
+                    if isinstance(row.get(k), str)
+                    and row[k].lstrip().startswith(("=", "+", "-", "@"))
+                    else row.get(k, "")
+                )
+                for k in fields
+            }
+        )
     return StreamingResponse(
         iter([output.getvalue()]),
         media_type="text/csv",
-        headers={"Content-Disposition": f"attachment; filename=ranked_{run_id[:8]}.csv"},
+        headers={"Content-Disposition": f'attachment; filename="prism_{run_id[:8]}.csv"'},
     )
 
 
 @app.get("/stats")
-def stats():
-    """Quick stats for the dashboard header."""
+def stats(user=Depends(recruiter)):
+    candidates = db.get_all_candidates(limit=100000)
     return {
-        "total_candidates": count_candidates(),
-        "vectors_indexed":  vcount(),
+        "total_candidates": len(candidates),
+        "vectors_indexed": sum(c.get("index_status") == "ready" for c in candidates),
     }
 
 
 @app.get("/analytics")
-def analytics():
-    """
-    Aggregate analytics for the Analytics Dashboard page.
-    Returns domain distribution, top skills, score stats, recent runs.
-    """
-    try:
-        return get_analytics()
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def analytics(user=Depends(recruiter)):
+    return db.get_analytics()
 
 
-@app.get("/runs")
-def list_runs(limit: int = 50):
-    """List all past ranking runs (most recent first)."""
-    try:
-        from database import list_jd_runs
-        runs = list_jd_runs(limit=limit)
-        return {"total": len(runs), "runs": runs}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+MAX_UPLOAD = 5 * 1024 * 1024
 
-@app.delete("/runs")
-def clear_runs():
-    """Clear all past ranking runs."""
+
+async def read_upload(file):
+    data = await file.read(MAX_UPLOAD + 1)
+    if len(data) > MAX_UPLOAD:
+        raise HTTPException(413, "Upload must be 5 MB or smaller.")
+    return data
+
+
+def pdf_text(data):
+    import pypdf
+
+    if not data.startswith(b"%PDF-"):
+        raise HTTPException(422, "File is not a valid PDF.")
     try:
-        from database import clear_all_runs
-        clear_all_runs()
-        return {"status": "success", "message": "All runs cleared"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        reader = pypdf.PdfReader(io.BytesIO(data))
+        if len(reader.pages) > 30:
+            raise HTTPException(422, "PDF must have at most 30 pages.")
+        text = "\n".join(p.extract_text() or "" for p in reader.pages)
+    except HTTPException:
+        raise
+    except Exception:
+        raise HTTPException(422, "Unable to read this PDF.")
+    if not text.strip():
+        raise HTTPException(422, "PDF contains no extractable text.")
+    if len(text) > 100000:
+        raise HTTPException(422, "PDF text exceeds 100,000 characters.")
+    return text
 
 
 @app.post("/candidates/upload")
-async def upload_candidates(
-    background_tasks: BackgroundTasks,
-    file: UploadFile = File(...)
-):
-    """
-    Upload a CSV of candidates or a PDF resume, and ingest them.
-    Supports:
-      - .csv: Bulk candidate load (similar to data_ingest.py).
-      - .pdf: Interactive resume parsing using NVIDIA NIM.
-    """
-    import os
-    import uuid
-    import shutil
-    import io
-    
-    filename = file.filename or ""
+async def upload(file: UploadFile = File(...), user=Depends(current_user)):
+    limit_requests("upload:" + user["username"], 10)
+    filename = (file.filename or "").lower()
+    if not filename.endswith((".pdf", ".csv")):
+        raise HTTPException(422, "Upload a PDF resume or CSV candidate file.")
+    data = await read_upload(file)
     if filename.endswith(".csv"):
-        temp_dir = "data/temp"
-        os.makedirs(temp_dir, exist_ok=True)
-        temp_file_path = os.path.join(temp_dir, f"upload_{uuid.uuid4().hex}.csv")
-        
+        if user["role"] not in {"recruiter", "admin"}:
+            raise HTTPException(403, "Only recruiters can bulk import candidates.")
+        from data_ingest import ingest
+
         try:
-            # Save upload to temp file
-            with open(temp_file_path, "wb") as f:
-                shutil.copyfileobj(file.file, f)
-            
-            from data_ingest import ingest
-            from database import count_candidates as db_count
-            
-            before_count = db_count()
-            ingest(temp_file_path)
-            after_count = db_count()
-            added = after_count - before_count
-            
-            # Clean up temp file
-            if os.path.exists(temp_file_path):
-                os.remove(temp_file_path)
-                
+            rows = list(csv.DictReader(io.StringIO(data.decode("utf-8-sig"))))
+        except (UnicodeError, csv.Error):
+            raise HTTPException(422, "Invalid UTF-8 CSV.")
+        if not rows or len(rows) > 500:
+            raise HTTPException(422, "CSV must contain between 1 and 500 candidates.")
+        for row in rows:
+            for key in ("id", "ID", "candidate_id", "owner_id", "visibility"):
+                row.pop(key, None)
+            row["candidate_id"] = "cand_" + uuid.uuid4().hex
+        handle, path = tempfile.mkstemp(suffix=".csv")
+        try:
+            with os.fdopen(handle, "w", newline="", encoding="utf-8") as stream:
+                writer = csv.DictWriter(
+                    stream, fieldnames=list(dict.fromkeys(k for row in rows for k in row))
+                )
+                writer.writeheader()
+                writer.writerows(rows)
+            before = db.count_candidates()
+            await run_in_threadpool(ingest, path)
             return {
                 "status": "success",
                 "type": "csv",
-                "added_count": added,
-                "total_count": after_count
+                "added_count": db.count_candidates() - before,
+                "total_count": db.count_candidates(),
             }
-        except Exception as e:
-            if os.path.exists(temp_file_path):
-                os.remove(temp_file_path)
-            raise HTTPException(status_code=500, detail=f"CSV upload failed: {str(e)}")
-            
-    elif filename.endswith(".pdf"):
-        import pypdf
-        from resume_parser import parse_resume_text
-        from data_ingest import ingest_single_candidate
-        
-        try:
-            pdf_bytes = await file.read()
-            pdf_file = io.BytesIO(pdf_bytes)
-            
-            # Extract text from PDF
-            reader = pypdf.PdfReader(pdf_file)
-            text_parts = []
-            for page in reader.pages:
-                text_parts.append(page.extract_text() or "")
-            full_text = "\n".join(text_parts)
-            
-            if not full_text.strip():
-                raise HTTPException(status_code=400, detail="The uploaded PDF contains no extractable text.")
-            
-            # Parse resume using LLaMA via NVIDIA NIM
-            parsed_cand = parse_resume_text(full_text)
-            
-            # Ingest candidate
-            ingested_cand = ingest_single_candidate(parsed_cand)
-            
-            return {
-                "status": "success",
-                "type": "pdf",
-                "candidate": {
-                    "id": ingested_cand["id"],
-                    "name": ingested_cand["name"],
-                    "current_title": ingested_cand["current_title"],
-                    "skills": ingested_cand["skills"]
-                }
-            }
-        except ValueError as ve:
-            raise HTTPException(status_code=400, detail=str(ve))
-        except Exception as e:
-            print(f"[API] PDF Ingestion failed: {e}")
-            raise HTTPException(status_code=500, detail=f"PDF parsing failed: {str(e)}")
-            
+        finally:
+            os.unlink(path)
+    from resume_parser import parse_resume_text
+
+    text = await run_in_threadpool(pdf_text, data)
+    parsed = await run_in_threadpool(parse_resume_text, text)
+    if user["role"] == "candidate":
+        existing = candidate_or_404(user["candidate_id"], user, edit=True)
+        parsed = {
+            **existing,
+            **parsed,
+            "id": existing["id"],
+            "owner_id": user["username"],
+            "visibility": existing["visibility"],
+        }
     else:
-        raise HTTPException(
-            status_code=400,
-            detail="Unsupported file format. Please upload a .csv or .pdf file."
-        )
+        parsed["id"] = "cand_" + uuid.uuid4().hex
+        parsed["owner_id"] = user["workspace_id"]
+    from utils import estimate_completeness
+
+    parsed["profile_completeness"] = estimate_completeness(parsed)
+    db.upsert_candidate(parsed)
+    with db.get_conn() as conn:
+        conn.execute("UPDATE candidates SET index_status='pending' WHERE id=?", (parsed["id"],))
+    return {"status": "success", "type": "pdf", "candidate": parsed}
 
 
-class JDAnalyzeRequest(BaseModel):
-    jd_text: str
+class JDInput(BaseModel):
+    jd_text: str = Field(min_length=50, max_length=30000)
 
 
 @app.post("/jd/analyze")
-def analyze_jd(request: JDAnalyzeRequest):
-    """Analyze raw job description text to extract structured requirements."""
-    try:
-        from jd_parser import parse_jd
-        return parse_jd(request.jd_text)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def analyze(body: JDInput, user=Depends(recruiter)):
+    from jd_parser import parse_jd
+
+    limit_requests("ai:" + user["username"], 20)
+    return parse_jd(body.jd_text)
 
 
 @app.post("/jd/analyze/file")
-async def analyze_jd_file(file: UploadFile = File(...)):
-    """Upload a job description PDF, extract text, and run AI structured analysis."""
-    filename = file.filename or ""
-    if not filename.endswith(".pdf"):
-        raise HTTPException(status_code=400, detail="Only PDF files are supported.")
-    try:
-        import pypdf
-        from jd_parser import parse_jd
-        pdf_bytes = await file.read()
-        pdf_file = io.BytesIO(pdf_bytes)
-        reader = pypdf.PdfReader(pdf_file)
-        text_parts = []
-        for page in reader.pages:
-            text_parts.append(page.extract_text() or "")
-        full_text = "\n".join(text_parts)
-        if not full_text.strip():
-            raise HTTPException(status_code=400, detail="PDF has no extractable text.")
-        analysis = parse_jd(full_text)
-        analysis["jd_text"] = full_text
-        return analysis
-    except Exception as e:
-        print(f"[API] JD PDF parsing failed: {e}")
-        raise HTTPException(status_code=500, detail=f"JD PDF parsing failed: {str(e)}")
+async def analyze_file(file: UploadFile = File(...), user=Depends(recruiter)):
+    from jd_parser import parse_jd
 
+    limit_requests("ai:" + user["username"], 20)
+    text = await run_in_threadpool(pdf_text, await read_upload(file))
+    return {**await run_in_threadpool(parse_jd, text), "jd_text": text}
 
-@app.get("/candidates/search")
-def search_candidates_api(q: str, limit: int = 50):
-    """Semantic search candidate pool using ChromaDB cosine similarity."""
-    try:
-        from vector_store import search as vector_search
-        from database import get_candidate
-        
-        vector_results = vector_search(q, top_n=limit)
-        results = []
-        for r in vector_results:
-            cand = get_candidate(r["candidate_id"])
-            if cand:
-                cand["similarity_score"] = r["similarity"]
-                results.append(cand)
-        return results
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-class InterviewQRequest(BaseModel):
-    parsed_jd: dict
-
-@app.post("/candidates/{candidate_id}/interview-questions")
-async def get_interview_questions(candidate_id: str, request: InterviewQRequest):
-    """Generate targeted interview questions based on the JD and candidate profile."""
-    try:
-        from explainer import generate_interview_questions
-        from database import get_candidate
-        
-        cand = get_candidate(candidate_id)
-        if not cand:
-            raise HTTPException(status_code=404, detail="Candidate not found")
-            
-        questions = await generate_interview_questions(cand, request.parsed_jd)
-        return {"questions": questions}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/jd/bias-scan")
-def scan_jd_for_bias(request: JDAnalyzeRequest):
-    """Scan JD for biased/exclusionary language."""
+def bias_scan(body: JDInput, user=Depends(recruiter)):
+    from jd_parser import scan_jd_bias
+
+    limit_requests("ai:" + user["username"], 20)
+    return scan_jd_bias(body.jd_text)
+
+
+class InterviewInput(BaseModel):
+    parsed_jd: dict
+
+
+@app.post("/candidates/{candidate_id}/interview-questions")
+async def interview(candidate_id: str, body: InterviewInput, user=Depends(recruiter)):
+    from explainer import generate_interview_questions
+
+    limit_requests("ai:" + user["username"], 20)
+    return {
+        "questions": await generate_interview_questions(
+            candidate_or_404(candidate_id, user), body.parsed_jd
+        )
+    }
+
+
+import time
+from collections import deque
+from threading import Lock
+
+_timings = deque(maxlen=1000)
+_metrics_lock = Lock()
+
+
+@app.middleware("http")
+async def observe_requests(request, call_next):
+    started = time.perf_counter()
+    status = 500
     try:
-        from jd_parser import scan_jd_bias
-        return scan_jd_bias(request.jd_text)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        response = await call_next(request)
+        status = response.status_code
+        return response
+    finally:
+        with _metrics_lock:
+            _timings.append(
+                {"duration_ms": round((time.perf_counter() - started) * 1000, 2), "status": status}
+            )
 
 
+@app.get("/admin/metrics")
+def metrics(user=Depends(admin)):
+    from llm_client import get_token_usage
+    from config import NVIDIA_API_KEY
+
+    with _metrics_lock:
+        timings = list(_timings)
+    return {
+        "requests_observed": len(timings),
+        "failed_requests": sum(t["status"] >= 500 for t in timings),
+        "average_duration_ms": round(sum(t["duration_ms"] for t in timings) / len(timings), 2)
+        if timings
+        else None,
+        "token_usage": get_token_usage(),
+        "ai_configured": bool(NVIDIA_API_KEY),
+        "candidates": db.count_candidates(),
+        "scope": "This server process; latest 1,000 requests",
+    }
+
+
+@app.post("/admin/reindex")
+def reindex(user=Depends(admin)):
+    from data_ingest import rebuild_index
+
+    return {"indexed": rebuild_index()}

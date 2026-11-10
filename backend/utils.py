@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Optional, Union
 
 # ── ID generation ──────────────────────────────────────────────────────────────
 
+
 def new_run_id() -> str:
     """Generate a unique run ID (short UUID)."""
     return str(uuid.uuid4())
@@ -21,12 +22,13 @@ def new_run_id() -> str:
 
 # ── Text helpers ───────────────────────────────────────────────────────────────
 
+
 def clean_text(text: str) -> str:
     """Remove excessive whitespace and non-printable chars."""
     if not text:
         return ""
-    text = re.sub(r"[^\x20-\x7E\n]", " ", str(text))   # keep printable ASCII
-    text = re.sub(r"\s{3,}", "  ", text)                 # collapse whitespace
+    text = re.sub(r"[^\x20-\x7E\n]", " ", str(text))  # keep printable ASCII
+    text = re.sub(r"\s{3,}", "  ", text)  # collapse whitespace
     return text.strip()
 
 
@@ -62,12 +64,19 @@ def skills_to_list(raw: Any) -> List[str]:
 # ── Date helpers ───────────────────────────────────────────────────────────────
 
 DATE_FORMATS = [
-    "%Y-%m-%d", "%Y/%m/%d", "%d/%m/%Y", "%m/%d/%Y",
-    "%Y-%m", "%m/%Y",
-    "%b %Y", "%B %Y",
-    "%Y-%m-%dT%H:%M:%S", "%Y-%m-%d %H:%M:%S",
+    "%Y-%m-%d",
+    "%Y/%m/%d",
+    "%d/%m/%Y",
+    "%m/%d/%Y",
+    "%Y-%m",
+    "%m/%Y",
+    "%b %Y",
+    "%B %Y",
+    "%Y-%m-%dT%H:%M:%S",
+    "%Y-%m-%d %H:%M:%S",
     "%Y",
 ]
+
 
 def parse_date(raw: str) -> Optional[date]:
     """Try multiple date formats, return date or None."""
@@ -99,12 +108,13 @@ def days_since(date_str: str) -> Optional[int]:
 def years_between(start_str: str, end_str: str) -> float:
     """Return decimal years between two date strings."""
     start = parse_date(start_str) or date.today()
-    end   = parse_date(end_str)   or date.today()
+    end = parse_date(end_str) or date.today()
     delta = (end - start).days
     return max(0.0, round(delta / 365.25, 2))
 
 
 # ── Score helpers ──────────────────────────────────────────────────────────────
+
 
 def clamp(value: float, lo: float = 0.0, hi: float = 1.0) -> float:
     """Clamp a float to [lo, hi]."""
@@ -136,6 +146,7 @@ def weighted_average(scores: Dict[str, float], weights: Dict[str, float]) -> flo
 
 # ── JSON helpers ───────────────────────────────────────────────────────────────
 
+
 def safe_json_loads(text: Any, default=None):
     """Parse JSON string without raising. Returns default on failure."""
     if text is None:
@@ -158,15 +169,24 @@ def safe_json_dumps(obj: Any) -> str:
 
 # ── Candidate profile helpers ──────────────────────────────────────────────────
 
+
 def estimate_completeness(candidate: Dict) -> float:
     """Return 0-1 completeness estimate based on populated fields."""
     REQUIRED = [
-        "name", "current_title", "current_company",
-        "years_experience", "skills",
+        "name",
+        "current_title",
+        "current_company",
+        "years_experience",
+        "skills",
     ]
     OPTIONAL = [
-        "email", "phone", "location", "domain",
-        "career_history", "education", "last_active",
+        "email",
+        "phone",
+        "location",
+        "domain",
+        "career_history",
+        "education",
+        "last_active",
     ]
     filled_req = sum(1 for f in REQUIRED if candidate.get(f))
     filled_opt = sum(1 for f in OPTIONAL if candidate.get(f))
@@ -178,13 +198,35 @@ def get_domain_from_company(company_name: str) -> str:
     """Very lightweight domain inference from company name."""
     company_lower = company_name.lower()
     domain_keywords = {
-        "fintech":    ["bank", "pay", "fin", "credit", "loan", "insurance", "wealth", "zerodha", "groww", "razorpay", "paytm"],
-        "ecommerce":  ["shop", "commerce", "buy", "sell", "amazon", "flipkart", "meesho", "myntra", "nykaa"],
+        "fintech": [
+            "bank",
+            "pay",
+            "fin",
+            "credit",
+            "loan",
+            "insurance",
+            "wealth",
+            "zerodha",
+            "groww",
+            "razorpay",
+            "paytm",
+        ],
+        "ecommerce": [
+            "shop",
+            "commerce",
+            "buy",
+            "sell",
+            "amazon",
+            "flipkart",
+            "meesho",
+            "myntra",
+            "nykaa",
+        ],
         "healthtech": ["health", "medic", "pharma", "clinic", "hospital", "care", "wellness"],
-        "edtech":     ["learn", "edu", "teach", "course", "byju", "unacademy", "vedantu"],
-        "saas":       ["software", "tech", "cloud", "platform", "solutions", "systems"],
-        "gaming":     ["game", "play", "dream11", "mobile premier", "nazara"],
-        "telecom":    ["telecom", "jio", "airtel", "bsnl", "vodafone"],
+        "edtech": ["learn", "edu", "teach", "course", "byju", "unacademy", "vedantu"],
+        "saas": ["software", "tech", "cloud", "platform", "solutions", "systems"],
+        "gaming": ["game", "play", "dream11", "mobile premier", "nazara"],
+        "telecom": ["telecom", "jio", "airtel", "bsnl", "vodafone"],
     }
     for domain, keywords in domain_keywords.items():
         for kw in keywords:

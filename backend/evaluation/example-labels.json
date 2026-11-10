@@ -1,0 +1,7 @@
+{
+  "label_status": "synthetic example; requires independent recruiter review",
+  "cases": [
+    {"job_id": "python-backend", "description": "Python API engineer", "relevance": {"python-api": 3, "python-data": 1, "java-api": 1, "designer": 0}},
+    {"job_id": "go-backend", "description": "Go API engineer", "relevance": {"golang-api": 3, "django-api": 0, "designer": 0}}
+  ]
+}

@@ -11,3 +11,14 @@ build/
 .vite/
 *.db
 *.sqlite
+work/
+.pytest_cache/
+.coverage
+playwright-report/
+test-results/
+
+backend/data/chroma_store/
+backend/data/embedding_cache/
+backend/data/logs/
+
+.venv/

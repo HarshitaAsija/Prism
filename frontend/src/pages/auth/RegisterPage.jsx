@@ -20,15 +20,14 @@ export default function RegisterPage({ onBack, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (password.length < 6) { setError('Password must be at least 6 characters'); return; }
+    if (password.length < 10) { setError('Password must be at least 10 characters'); return; }
     setError('');
     setLoading(true);
     try {
-      await new Promise(r => setTimeout(r, 800));
-      const user = register(name, email, password, role);
+      const user = await register(name, email, password, role);
       onSuccess(user);
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.status === 409 ? err.response.data.detail : 'Registration failed. Use a valid email and a password of at least 10 characters.');
     } finally {
       setLoading(false);
     }
@@ -199,7 +198,7 @@ export default function RegisterPage({ onBack, onSuccess }) {
                 <label className="block text-xs font-medium text-slate-400 mb-1.5">Full Name</label>
                 <div className="relative">
                   <User size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
-                  <input value={name} onChange={e => setName(e.target.value)}
+                  <input aria-label="Full Name" value={name} onChange={e => setName(e.target.value)}
                          placeholder="Your full name" className="input-dark pl-9" required />
                 </div>
               </div>
@@ -208,7 +207,7 @@ export default function RegisterPage({ onBack, onSuccess }) {
                 <label className="block text-xs font-medium text-slate-400 mb-1.5">Email</label>
                 <div className="relative">
                   <Mail size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
-                  <input type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  <input type="email" aria-label="Email" value={email} onChange={e => setEmail(e.target.value)}
                          placeholder="you@company.com" className="input-dark pl-9" required />
                 </div>
               </div>
@@ -217,9 +216,9 @@ export default function RegisterPage({ onBack, onSuccess }) {
                 <label className="block text-xs font-medium text-slate-400 mb-1.5">Password</label>
                 <div className="relative">
                   <Lock size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
-                  <input type={showPw ? 'text' : 'password'} value={password}
+                  <input type={showPw ? 'text' : 'password'} aria-label="Password" value={password}
                          onChange={e => setPassword(e.target.value)}
-                         placeholder="Min. 6 characters" className="input-dark pl-9 pr-10" required />
+                         placeholder="Min. 10 characters" className="input-dark pl-9 pr-10" required />
                   <button type="button" onClick={() => setShowPw(p => !p)}
                           className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition-colors">
                     {showPw ? <EyeOff size={15} /> : <Eye size={15} />}

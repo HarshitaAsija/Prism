@@ -73,7 +73,7 @@ const TECH_STACK = [
   {
     name: 'ChromaDB',
     subtitle: 'Vector Similarity Search',
-    desc: 'Stores 768-dimensional candidate embeddings. Powers sub-second semantic search across the entire pool.',
+    desc: 'Stores 384-dimensional candidate embeddings. Powers sub-second semantic search across the entire pool.',
     icon: <Database size={20} />,
     color: '#e8572a',
     live: true,

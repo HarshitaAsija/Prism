@@ -7,15 +7,19 @@ import chromadb
 from typing import List, Dict, Any, Optional
 from config import CHROMA_PATH, CHROMA_COLLECTION
 
-# Ensure directory exists before initializing client
-os.makedirs(CHROMA_PATH, exist_ok=True)
+# Model/index initialization is lazy: auth and profile editing work offline.
+_collection = None
 
-# Initialize persistent client and collection using cosine distance metric
-_client = chromadb.PersistentClient(path=CHROMA_PATH)
-_collection = _client.get_or_create_collection(
-    name=CHROMA_COLLECTION,
-    metadata={"hnsw:space": "cosine"}
-)
+
+def collection():
+    global _collection
+    if _collection is None:
+        os.makedirs(CHROMA_PATH, exist_ok=True)
+        client = chromadb.PersistentClient(path=CHROMA_PATH)
+        _collection = client.get_or_create_collection(
+            name=CHROMA_COLLECTION, metadata={"hnsw:space": "cosine"}
+        )
+    return _collection
 
 
 def add_candidates(
@@ -32,7 +36,8 @@ def add_candidates(
     processed_metadatas = None
     if metadatas:
         processed_metadatas = []
-        for meta in metadatas:
+        for candidate_id, meta in zip(candidate_ids, metadatas):
+            meta = dict(meta, candidate_id=candidate_id)
             clean_meta = {}
             for k, v in meta.items():
                 if isinstance(v, (str, int, float, bool)):
@@ -44,11 +49,8 @@ def add_candidates(
                     clean_meta[k] = str(v)
             processed_metadatas.append(clean_meta)
 
-    _collection.upsert(
-        ids=candidate_ids,
-        embeddings=vectors,
-        metadatas=processed_metadatas,
-        documents=documents
+    collection().upsert(
+        ids=candidate_ids, embeddings=vectors, metadatas=processed_metadatas, documents=documents
     )
 
 
@@ -66,6 +68,7 @@ def add(
     else:
         # Fallback if text is passed instead of list (e.g. mock usage)
         from embedder import embed_text
+
         doc_str = document or str(vector_or_text)
         vector = embed_text(doc_str)
         document = doc_str
@@ -81,25 +84,33 @@ def add(
 def add_candidate(candidate_id: str, text: str, metadata: Optional[Dict[str, Any]] = None):
     """Add candidate using raw text (embeds locally)."""
     from embedder import embed_text
+
     vector = embed_text(text)
     add(candidate_id, vector, metadata, document=text)
 
 
-def search(query: Any, top_n: int = 50, top_k: Optional[int] = None) -> List[Dict[str, Any]]:
+def search(
+    query: Any,
+    top_n: int = 50,
+    top_k: Optional[int] = None,
+    candidate_ids: Optional[List[str]] = None,
+) -> List[Dict[str, Any]]:
     """
     Search ChromaDB for nearest candidate vectors.
-    
+
     Args:
         query: list of floats (query vector) or string (raw query text)
         top_n: number of results to return
         top_k: alias for top_n for backwards compatibility
     """
     limit = top_k if top_k is not None else top_n
-    
+
+    if candidate_ids is not None and not candidate_ids:
+        return []
     total_count = count()
     if total_count == 0:
         return []
-        
+
     n_results = min(limit, total_count)
     if n_results <= 0:
         return []
@@ -107,21 +118,35 @@ def search(query: Any, top_n: int = 50, top_k: Optional[int] = None) -> List[Dic
     # If query is text, embed it first
     if isinstance(query, str):
         from embedder import embed_text
+
         query_vector = embed_text(query)
     else:
         query_vector = query
 
-    results = _collection.query(
+    results = collection().query(
         query_embeddings=[query_vector],
-        n_results=n_results
+        n_results=n_results,
+        where={"candidate_id": {"$in": candidate_ids}} if candidate_ids is not None else None,
     )
 
     formatted_results = []
     if results and "ids" in results and results["ids"]:
         ids = results["ids"][0]
-        distances = results["distances"][0] if "distances" in results and results["distances"] else [0.0] * len(ids)
-        metadatas = results["metadatas"][0] if "metadatas" in results and results["metadatas"] else [None] * len(ids)
-        documents = results["documents"][0] if "documents" in results and results["documents"] else [None] * len(ids)
+        distances = (
+            results["distances"][0]
+            if "distances" in results and results["distances"]
+            else [0.0] * len(ids)
+        )
+        metadatas = (
+            results["metadatas"][0]
+            if "metadatas" in results and results["metadatas"]
+            else [None] * len(ids)
+        )
+        documents = (
+            results["documents"][0]
+            if "documents" in results and results["documents"]
+            else [None] * len(ids)
+        )
 
         for i in range(len(ids)):
             # In 'cosine' space, ChromaDB returns cosine distance (1.0 - cosine_similarity).
@@ -131,32 +156,43 @@ def search(query: Any, top_n: int = 50, top_k: Optional[int] = None) -> List[Dic
             # Clamp to [0, 1] range
             similarity = max(0.0, min(1.0, similarity))
 
-            formatted_results.append({
-                "candidate_id": ids[i],
-                "id": ids[i],
-                "score": similarity,
-                "similarity": similarity,
-                "metadata": metadatas[i] or {},
-                "document": documents[i]
-            })
+            formatted_results.append(
+                {
+                    "candidate_id": ids[i],
+                    "id": ids[i],
+                    "score": similarity,
+                    "similarity": similarity,
+                    "metadata": metadatas[i] or {},
+                    "document": documents[i],
+                }
+            )
 
     return formatted_results
 
 
 def count() -> int:
     """Return total number of documents in collection."""
-    return _collection.count()
+    return collection().count()
 
 
 class VectorStore:
     """Backwards compatible class interface."""
+
     def __init__(self):
         pass
 
-    def add_candidate(self, candidate_id: str, text: str, metadata: Optional[Dict[str, Any]] = None):
+    def add_candidate(
+        self, candidate_id: str, text: str, metadata: Optional[Dict[str, Any]] = None
+    ):
         return add_candidate(candidate_id, text, metadata)
 
-    def add(self, candidate_id: str, vector_or_text: Any, metadata: Optional[Dict[str, Any]] = None, document: Optional[str] = None):
+    def add(
+        self,
+        candidate_id: str,
+        vector_or_text: Any,
+        metadata: Optional[Dict[str, Any]] = None,
+        document: Optional[str] = None,
+    ):
         return add(candidate_id, vector_or_text, metadata, document)
 
     def search(self, query: Any, top_n: int = 50, top_k: Optional[int] = None):
