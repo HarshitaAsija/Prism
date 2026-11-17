@@ -23,6 +23,9 @@ api.interceptors.response.use(
   },
 );
 export const getMyProfile = () => api.get("/me/profile").then((r) => r.data);
+export const exportMyData = () => api.get("/me/export").then((r) => r.data);
+export const deleteMyAccount = (confirm_email) =>
+  api.delete("/me/account", { data: { confirm_email } }).then((r) => r.data);
 export const rerankRun = (id) =>
   api.post(`/runs/${id}/rerank`).then((r) => r.data);
 export const getHealth = () => api.get("/health").then((r) => r.data);

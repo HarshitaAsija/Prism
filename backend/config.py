@@ -26,10 +26,12 @@ CHROMA_COLLECTION = "candidates"
 
 # ── Default scoring weights (must sum to 1.0) ─────────────────────────────────
 DEFAULT_WEIGHTS = {
-    "semantic": 0.30,
-    "skill": 0.25,
-    "trajectory": 0.20,
-    "behavioral": 0.15,
+    "semantic": 0.35,
+    "skill": 0.30,
+    "trajectory": 0.25,
+    # Activity and profile-completeness are not decision factors by default.
+    # Recruiters can opt in for an availability-oriented workflow.
+    "behavioral": 0.0,
     "domain": 0.10,
 }
 

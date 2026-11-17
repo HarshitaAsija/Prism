@@ -328,6 +328,21 @@ def get_all_candidates(limit: int = 5000, offset: int = 0) -> List[Dict]:
     return [_clean_floats(_deserialise(dict(r))) for r in rows]
 
 
+def get_candidates_by_ids(candidate_ids: List[str]) -> List[Dict]:
+    """Return only visible candidates from an explicit, bounded candidate set."""
+    ids = list(dict.fromkeys(candidate_ids))
+    if not ids:
+        return []
+    where, params = candidate_scope()
+    placeholders = ",".join("?" for _ in ids)
+    with get_conn() as conn:
+        rows = conn.execute(
+            "SELECT * FROM candidates WHERE id IN (" + placeholders + ") AND " + where,
+            [*ids, *params],
+        ).fetchall()
+    return [_clean_floats(_deserialise(dict(r))) for r in rows]
+
+
 def count_candidates() -> int:
     where, params = candidate_scope()
     with get_conn() as conn:

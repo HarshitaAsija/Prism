@@ -329,11 +329,63 @@ def match(job_id: str, user=Depends(current_user)):
     score, gaps = skill_score(
         get_candidate(user["candidate_id"]), {"required_skills": job["required_skills"]}
     )
+    missing = [gap["skill"] for gap in gaps if gap["status"] == "missing"]
+    partial = [gap["skill"] for gap in gaps if gap["status"] == "partial"]
+    suggestions = []
+    if missing:
+        suggestions.append("Add evidence for: " + ", ".join(missing[:5]))
+    if partial:
+        suggestions.append("Strengthen project or role evidence for: " + ", ".join(partial[:5]))
+    if not suggestions:
+        suggestions.append("Your profile covers the listed skills. Add measurable outcomes to make that evidence easier to review.")
     return {
         "score": round(score * 100, 2),
         "skill_gap": gaps,
+        "suggestions": suggestions,
         "method": "Required skill coverage with resume evidence. This is not a hiring probability.",
     }
+
+
+@router.post("/jobs/{job_id}/rank-applicants")
+async def rank_applicants(job_id: str, user=Depends(recruiter)):
+    """Rank only the current workspace's applicants against their actual job."""
+    with get_conn() as conn:
+        job = owned_job(job_id, user, conn)
+        applicants = conn.execute(
+            "SELECT candidate_id FROM applications WHERE job_id=? AND stage!='withdrawn'",
+            (job_id,),
+        ).fetchall()
+    candidate_ids = [row["candidate_id"] for row in applicants]
+    if not candidate_ids:
+        return {"job_id": job_id, "results": [], "message": "No active applicants to rank."}
+
+    from ranker import rank_candidates
+
+    required_skills = json.loads(job["required_skills"])
+    parsed_job = {
+        "job_title": job["title"],
+        "seniority_level": "mid",
+        "domain": "general",
+        "required_skills": required_skills,
+        "preferred_skills": [],
+        "years_experience_min": 0,
+        "years_experience_max": 20,
+        "key_responsibilities": [],
+        "deal_breakers": [],
+        "soft_skills": [],
+        "education_requirement": "any",
+        "remote_friendly": None,
+        "suggested_weight_bias": "balanced",
+        "domain_keywords": required_skills,
+    }
+    result = await rank_candidates(
+        job["description"] + "\nRequired skills: " + ", ".join(required_skills),
+        top_n=len(candidate_ids),
+        candidate_ids=candidate_ids,
+        parsed_jd=parsed_job,
+        pipeline_metadata={"job_id": job_id, "mode": "applicant_ranking"},
+    )
+    return {**result, "job_id": job_id, "message": "Ranked active applicants for this job."}
 
 
 class InviteInput(BaseModel):

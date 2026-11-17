@@ -11,14 +11,14 @@ const SIGNALS = [
 ];
 
 export const DEFAULT_WEIGHTS = {
-  semantic: 30, skill: 25, trajectory: 20, behavioral: 15, domain: 10,
+  semantic: 35, skill: 30, trajectory: 25, behavioral: 0, domain: 10,
 };
 
 const PRESETS = {
-  balanced:    { semantic: 30, skill: 25, trajectory: 20, behavioral: 15, domain: 10 },
-  skillFocus:  { semantic: 20, skill: 40, trajectory: 15, behavioral: 10, domain: 15 },
-  experience:  { semantic: 20, skill: 20, trajectory: 40, behavioral: 10, domain: 10 },
-  intent:      { semantic: 25, skill: 20, trajectory: 15, behavioral: 30, domain: 10 },
+  balanced:    { semantic: 35, skill: 30, trajectory: 25, behavioral: 0, domain: 10 },
+  skillFocus:  { semantic: 25, skill: 45, trajectory: 15, behavioral: 0, domain: 15 },
+  experience:  { semantic: 25, skill: 20, trajectory: 45, behavioral: 0, domain: 10 },
+  availability: { semantic: 25, skill: 20, trajectory: 15, behavioral: 30, domain: 10 },
 };
 
 export default function WeightSliders({ weights, onChange }) {
@@ -53,7 +53,7 @@ export default function WeightSliders({ weights, onChange }) {
 
       {/* Preset buttons */}
       <div className="flex flex-wrap gap-1.5">
-        {Object.entries({ balanced: 'Balanced', skillFocus: 'Skills-Heavy', experience: 'Experience', intent: 'Intent-Bias' }).map(([k, label]) => (
+        {Object.entries({ balanced: 'Balanced', skillFocus: 'Skills-Heavy', experience: 'Experience', availability: 'Availability' }).map(([k, label]) => (
           <button key={k} onClick={() => applyPreset(k)}
                   className="px-2.5 py-1 rounded-lg text-xs font-medium transition-all duration-150 bg-slate-800/60 border border-slate-700/40 text-slate-400 hover:text-slate-200 hover:border-teal-500/30">
             {label}

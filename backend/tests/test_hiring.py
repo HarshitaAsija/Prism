@@ -1,5 +1,7 @@
 import sys
 import types
+import io
+import zipfile
 from datetime import datetime, timedelta, timezone
 import pytest
 from test_security import account
@@ -73,6 +75,53 @@ def test_hiring_flow_and_private_notes(client):
     assert client.get("/candidates/" + candidate["candidate_id"]).status_code == 404
 
 
+def test_recruiter_can_rank_only_its_job_applicants(client, monkeypatch):
+    account(client, "owner@example.com", "recruiter")
+    job_id = client.post(
+        "/jobs",
+        json={
+            "title": "Backend Engineer",
+            "company": "Prism",
+            "location": "Remote",
+            "description": "Build reliable backend APIs and maintain production services with a small team.",
+            "required_skills": ["Python", "FastAPI"],
+        },
+    ).json()["id"]
+    client.post("/auth/logout")
+    candidate = account(client, "candidate@example.com")
+    client.put(
+        "/candidates/" + candidate["candidate_id"], json={"title": "Engineer", "skills": ["Python"]}
+    )
+    assert client.post(f"/jobs/{job_id}/apply", json={}).status_code == 201
+    client.post("/auth/logout")
+    client.post("/auth/login", json={"email": "owner@example.com", "password": "a-good-password"})
+    import ranker
+
+    received = {}
+
+    async def fake_rank(text, **kwargs):
+        received.update(kwargs)
+        return {
+            "run_id": "job-run",
+            "results": [
+                {
+                    "candidate_id": candidate["candidate_id"],
+                    "name": "Candidate",
+                    "rank": 1,
+                    "composite_score": 82,
+                }
+            ],
+        }
+
+    monkeypatch.setattr(ranker, "rank_candidates", fake_rank)
+    response = client.post(f"/jobs/{job_id}/rank-applicants")
+    assert response.status_code == 200, response.text
+    assert response.json()["job_id"] == job_id
+    assert received["candidate_ids"] == [candidate["candidate_id"]]
+    assert received["parsed_jd"]["required_skills"] == ["Python", "FastAPI"]
+    assert received["pipeline_metadata"] == {"job_id": job_id, "mode": "applicant_ranking"}
+
+
 def test_ai_failure_is_not_success(client, monkeypatch):
     account(client, role="recruiter")
     import jd_parser, resume_parser
@@ -124,6 +173,18 @@ def test_upload_bounds_and_role_before_ai_import(client):
         ).status_code
         == 413
     )
+
+
+def test_docx_text_extraction_is_bounded_and_plain():
+    from main import docx_text
+
+    payload = io.BytesIO()
+    with zipfile.ZipFile(payload, "w") as archive:
+        archive.writestr(
+            "word/document.xml",
+            '<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Jane Doe</w:t></w:r></w:p><w:p><w:r><w:t>Python FastAPI</w:t></w:r></w:p></w:body></w:document>',
+        )
+    assert docx_text(payload.getvalue()) == "Jane Doe\nPython FastAPI"
 
 
 def test_ranking_contract_fallback_and_atomic_save(client, monkeypatch):

@@ -28,6 +28,17 @@ def test_registration_password_session_and_logout(client):
     )
 
 
+def test_candidate_can_export_and_delete_own_account(client):
+    user = account(client, "candidate@example.com")
+    export = client.get("/me/export")
+    assert export.status_code == 200
+    assert export.json()["account"]["email"] == "candidate@example.com"
+    assert export.json()["profile"]["id"] == user["candidate_id"]
+    assert client.request("DELETE", "/me/account", json={"confirm_email": "wrong@example.com"}).status_code == 422
+    assert client.request("DELETE", "/me/account", json={"confirm_email": "candidate@example.com"}).status_code == 200
+    assert client.get("/auth/me").status_code == 401
+
+
 def test_anonymous_routes_are_protected(client):
     for path in ["/candidates", "/stats", "/analytics", "/runs", "/me/profile"]:
         assert client.get(path).status_code == 401

@@ -5,7 +5,10 @@ import io
 import os
 import tempfile
 import uuid
+import zipfile
+from datetime import datetime, timezone
 from typing import Optional
+from xml.etree import ElementTree
 from fastapi import Depends, FastAPI, File, HTTPException, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -99,6 +102,69 @@ def my_profile(user=Depends(current_user)):
     if user["role"] != "candidate":
         raise HTTPException(403, "Candidate account required.")
     return candidate_or_404(user["candidate_id"], user)
+
+
+class DeleteAccountInput(BaseModel):
+    confirm_email: str = Field(min_length=3, max_length=254)
+
+
+@app.get("/me/export")
+def export_my_data(user=Depends(current_user)):
+    """Return a candidate's stored profile and application data for portability."""
+    if user["role"] != "candidate":
+        raise HTTPException(403, "Candidate account required.")
+    profile = candidate_or_404(user["candidate_id"], user)
+    with db.get_conn() as conn:
+        applications = [
+            dict(row)
+            for row in conn.execute(
+                "SELECT a.*,j.title,j.company,j.location FROM applications a JOIN jobs j ON j.id=a.job_id WHERE a.applicant_id=? ORDER BY a.created_at DESC",
+                (user["username"],),
+            )
+        ]
+    return {
+        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "account": {"email": user["username"], "name": user.get("name", ""), "role": user["role"]},
+        "profile": profile,
+        "applications": applications,
+    }
+
+
+@app.delete("/me/account")
+def delete_my_candidate_account(body: DeleteAccountInput, user=Depends(current_user)):
+    """Permanently delete a candidate account after an explicit email confirmation."""
+    if user["role"] != "candidate":
+        raise HTTPException(403, "Only candidate accounts can be self-deleted.")
+    if body.confirm_email.strip().lower() != user["username"]:
+        raise HTTPException(422, "Enter your account email exactly to confirm deletion.")
+    candidate_id = user["candidate_id"]
+    with db.get_conn() as conn:
+        app_ids = [
+            row[0]
+            for row in conn.execute(
+                "SELECT id FROM applications WHERE applicant_id=?", (user["username"],)
+            )
+        ]
+        if app_ids:
+            markers = ",".join("?" for _ in app_ids)
+            conn.execute(f"DELETE FROM application_notes WHERE application_id IN ({markers})", app_ids)
+            conn.execute(f"DELETE FROM interviews WHERE application_id IN ({markers})", app_ids)
+            conn.execute(f"DELETE FROM application_events WHERE application_id IN ({markers})", app_ids)
+        conn.execute("DELETE FROM applications WHERE applicant_id=?", (user["username"],))
+        conn.execute("DELETE FROM feedback WHERE candidate_id=?", (candidate_id,))
+        conn.execute("DELETE FROM candidate_scores WHERE candidate_id=?", (candidate_id,))
+        conn.execute("DELETE FROM candidates WHERE id=? AND owner_id=?", (candidate_id, user["username"]))
+        conn.execute("DELETE FROM auth_sessions WHERE username=?", (user["username"],))
+        conn.execute("DELETE FROM auth_users WHERE username=?", (user["username"],))
+    # Embedded Chroma is derived data; deletion is best-effort if it has never
+    # been initialized or its local files are unavailable.
+    try:
+        from vector_store import collection
+
+        collection().delete(ids=[candidate_id])
+    except Exception:
+        pass
+    return {"status": "deleted"}
 
 
 # Static routes precede the dynamic candidate ID route.
@@ -297,12 +363,34 @@ def pdf_text(data):
     return text
 
 
+def docx_text(data):
+    """Extract bounded plain text from a DOCX without evaluating document content."""
+    if not data.startswith(b"PK"):
+        raise HTTPException(422, "File is not a valid DOCX.")
+    try:
+        with zipfile.ZipFile(io.BytesIO(data)) as archive:
+            if sum(member.file_size for member in archive.infolist()) > 10 * 1024 * 1024:
+                raise HTTPException(422, "DOCX expands beyond the 10 MB safety limit.")
+            xml = archive.read("word/document.xml")
+        root = ElementTree.fromstring(xml)
+        text = "\n".join(node.text or "" for node in root.iter() if node.tag.endswith("}t"))
+    except HTTPException:
+        raise
+    except (KeyError, zipfile.BadZipFile, ElementTree.ParseError):
+        raise HTTPException(422, "Unable to read this DOCX.")
+    if not text.strip():
+        raise HTTPException(422, "DOCX contains no extractable text.")
+    if len(text) > 100000:
+        raise HTTPException(422, "DOCX text exceeds 100,000 characters.")
+    return text
+
+
 @app.post("/candidates/upload")
 async def upload(file: UploadFile = File(...), user=Depends(current_user)):
     limit_requests("upload:" + user["username"], 10)
     filename = (file.filename or "").lower()
-    if not filename.endswith((".pdf", ".csv")):
-        raise HTTPException(422, "Upload a PDF resume or CSV candidate file.")
+    if not filename.endswith((".pdf", ".docx", ".csv")):
+        raise HTTPException(422, "Upload a PDF or DOCX resume, or a CSV candidate file.")
     data = await read_upload(file)
     if filename.endswith(".csv"):
         if user["role"] not in {"recruiter", "admin"}:
@@ -339,7 +427,7 @@ async def upload(file: UploadFile = File(...), user=Depends(current_user)):
             os.unlink(path)
     from resume_parser import parse_resume_text
 
-    text = await run_in_threadpool(pdf_text, data)
+    text = await run_in_threadpool(docx_text if filename.endswith(".docx") else pdf_text, data)
     parsed = await run_in_threadpool(parse_resume_text, text)
     if user["role"] == "candidate":
         existing = candidate_or_404(user["candidate_id"], user, edit=True)
@@ -359,7 +447,7 @@ async def upload(file: UploadFile = File(...), user=Depends(current_user)):
     db.upsert_candidate(parsed)
     with db.get_conn() as conn:
         conn.execute("UPDATE candidates SET index_status='pending' WHERE id=?", (parsed["id"],))
-    return {"status": "success", "type": "pdf", "candidate": parsed}
+    return {"status": "success", "type": "docx" if filename.endswith(".docx") else "pdf", "candidate": parsed}
 
 
 class JDInput(BaseModel):

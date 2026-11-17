@@ -16,6 +16,7 @@ export default function HiringWorkspace() {
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
   const [match, setMatch] = useState({});
+  const [applicantRanks, setApplicantRanks] = useState({});
   const [search, setSearch] = useState("");
   const load = useCallback(async () => {
     const [j, a] = await Promise.all([
@@ -197,19 +198,50 @@ export default function HiringWorkspace() {
                         .map((g) => g.skill)
                         .join(", ") || "None listed"}
                     </p>
+                    <ul className="text-xs text-slate-300 list-disc pl-5 space-y-1">
+                      {match[j.id].suggestions?.map((suggestion) => (
+                        <li key={suggestion}>{suggestion}</li>
+                      ))}
+                    </ul>
                   </div>
                 )}
               </div>
             ) : (
-              j.status === "open" && (
-                <button
-                  className="btn-secondary"
-                  disabled={busy}
-                  onClick={() => action(() => api.patch(`/jobs/${j.id}`))}
-                >
-                  Close applications
-                </button>
-              )
+              <div className="space-y-3">
+                <div className="flex gap-2 flex-wrap">
+                  <button
+                    className="btn-primary"
+                    disabled={busy}
+                    onClick={() =>
+                      action(async () => {
+                        const response = await api.post(`/jobs/${j.id}/rank-applicants`);
+                        setApplicantRanks((current) => ({ ...current, [j.id]: response.data }));
+                      })
+                    }
+                  >
+                    Rank applicants
+                  </button>
+                  {j.status === "open" && (
+                    <button
+                      className="btn-secondary"
+                      disabled={busy}
+                      onClick={() => action(() => api.patch(`/jobs/${j.id}`))}
+                    >
+                      Close applications
+                    </button>
+                  )}
+                </div>
+                {applicantRanks[j.id] && (
+                  <div className="rounded-xl border border-teal-500/20 bg-teal-500/5 p-3 text-sm space-y-2">
+                    <p className="font-medium text-teal-200">{applicantRanks[j.id].message}</p>
+                    {applicantRanks[j.id].results?.map((rankedCandidate) => (
+                      <p key={rankedCandidate.candidate_id} className="text-slate-300">
+                        #{rankedCandidate.rank} {rankedCandidate.name} · {Math.round(rankedCandidate.composite_score)}/100
+                      </p>
+                    ))}
+                  </div>
+                )}
+              </div>
             )}
           </article>
         ))}

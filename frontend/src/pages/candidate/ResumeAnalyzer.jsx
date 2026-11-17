@@ -12,8 +12,8 @@ export default function ResumeAnalyzer({ onAnalysisFinished }) {
   const handleFileChange = async (e) => {
     const selectedFile = e.target.files?.[0];
     if (!selectedFile) return;
-    if (selectedFile.type !== 'application/pdf') {
-      setError('Only PDF files are supported.');
+    if (!selectedFile.name.toLowerCase().match(/\.(pdf|docx)$/)) {
+      setError('Upload a PDF or DOCX resume.');
       return;
     }
     setFile(selectedFile);
@@ -23,7 +23,7 @@ export default function ResumeAnalyzer({ onAnalysisFinished }) {
 
     try {
       const data = await uploadCandidates(selectedFile);
-      if (data.status === 'success' && data.type === 'pdf') {
+      if (data.status === 'success' && ['pdf', 'docx'].includes(data.type)) {
         setParsedData(data.candidate);
       } else {
         throw new Error('Unexpected parsing result from backend.');
@@ -62,7 +62,7 @@ export default function ResumeAnalyzer({ onAnalysisFinished }) {
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
-              accept=".pdf"
+              accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
               className="hidden"
             />
             <div className="w-12 h-12 rounded-xl bg-slate-800 flex items-center justify-center mx-auto text-slate-500">
@@ -70,7 +70,7 @@ export default function ResumeAnalyzer({ onAnalysisFinished }) {
             </div>
             <div>
               <p className="text-xs font-semibold text-slate-300">
-                {loading ? 'Analyzing resume details...' : 'Choose a PDF resume'}
+                {loading ? 'Analyzing resume details...' : 'Choose a PDF or DOCX resume'}
               </p>
               <p className="text-[10px] text-slate-500 mt-1">
                 {loading ? 'Running extraction engines...' : 'or click to browse local files'}

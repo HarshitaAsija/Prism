@@ -101,10 +101,10 @@ export const copyToClipboard = async (text) => {
 /** Normalize raw slider values (0-100) to sum-to-1 floats for backend */
 export const normalizeWeights = (raw) => {
   const defaults = {
-    semantic: 30,
-    skill: 25,
-    trajectory: 20,
-    behavioral: 15,
+    semantic: 35,
+    skill: 30,
+    trajectory: 25,
+    behavioral: 0,
     domain: 10,
   };
   const safe = Object.fromEntries(

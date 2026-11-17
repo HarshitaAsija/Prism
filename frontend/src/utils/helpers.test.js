@@ -39,8 +39,9 @@ test("Changing weights preserves units and ranks by selected evidence", () => {
   assert.equal(ranked[0].rank, 1);
   assert.equal(results[0].rank, undefined);
 });
-test("Zero weights use server defaults and equal scores remain 80", () => {
-  assert.equal(normalizeWeights({}).semantic, 0.3);
+test("Zero weights use fairness-conscious server defaults and equal scores remain 80", () => {
+  assert.equal(normalizeWeights({}).semantic, 0.35);
+  assert.equal(normalizeWeights({}).behavioral, 0);
   assert.equal(
     reweightResults(
       [

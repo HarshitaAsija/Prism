@@ -13,6 +13,7 @@ from config import (
 )
 from database import (
     get_all_candidates,
+    get_candidates_by_ids,
     get_conn,
     save_jd_run,
     save_score,
@@ -23,11 +24,17 @@ from combiner import build_score_dict, _normalise_weights
 from scorer import semantic_score, skill_score, trajectory_score, behavioral_score, domain_score
 
 
-def retrieve(jd_text):
+def retrieve(jd_text, candidate_ids=None):
     from embedder import embed_text, embed_batch, build_candidate_profile_text
     from vector_store import add_candidates, search, collection
 
-    profiles = get_all_candidates(limit=100000)
+    # Job applicant ranking passes a small, explicit set. General discovery keeps
+    # the existing workspace-scoped candidate pool.
+    profiles = (
+        get_candidates_by_ids(candidate_ids)
+        if candidate_ids is not None
+        else get_all_candidates(limit=100000)
+    )
     ids = [c["id"] for c in profiles]
     if not ids:
         return [], {}
@@ -52,13 +59,25 @@ def retrieve(jd_text):
     }
 
 
-async def rank_candidates(jd_text, weights=None, run_id=None, previous_run_id=None, top_n=20):
+async def rank_candidates(
+    jd_text,
+    weights=None,
+    run_id=None,
+    previous_run_id=None,
+    top_n=20,
+    candidate_ids=None,
+    parsed_jd=None,
+    pipeline_metadata=None,
+):
     from jd_parser import parse_jd
     from explainer import batch_explain, batch_outreach
     from feedback_reranker import apply_feedback_boost
 
-    parsed = await run_in_threadpool(parse_jd, jd_text)
-    matches, profiles = await run_in_threadpool(retrieve, jd_text)
+    parsed = parsed_jd or await run_in_threadpool(parse_jd, jd_text)
+    if candidate_ids is None:
+        matches, profiles = await run_in_threadpool(retrieve, jd_text)
+    else:
+        matches, profiles = await run_in_threadpool(retrieve, jd_text, candidate_ids)
     weights = _normalise_weights(weights or DEFAULT_WEIGHTS)
     feedback = get_feedback_map(previous_run_id) if previous_run_id else {}
     scored = []
@@ -110,6 +129,7 @@ async def rank_candidates(jd_text, weights=None, run_id=None, previous_run_id=No
                         "explanation_model": NVIDIA_MODEL,
                         "previous_run_id": previous_run_id,
                         "feedback": feedback,
+                        **(pipeline_metadata or {}),
                     }
                 ),
             ),
